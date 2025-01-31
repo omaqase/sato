@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+option go_package = "github.com/omaqase/sato/user/pkg/api/v1/user;protobuf";
+
+package api.v1.user;
+
+import "category_messages.proto";
+
+import "google/api/annotations.proto";
+
+service UserService {
+    rpc SignUp (SignUpRequest) returns (SignUpResponse) {
+        option (google.api.http) = {
+            post: "/api/v1/auth/sign-up"
+        };
+    }
+
+    rpc SignIn (SignInRequest) returns (SignInResponse) {
+        option (google.api.http) = {
+            post: "/api/v1/auth/sign-in"
+        };
+    }
+
+    rpc LogOut (LogOutRequest) returns (LogOutResponse) {
+        option (google.api.http) = {
+            post: "/api/v1/auth/logout"
+        };
+    }
+
+    rpc RefreshToken (RefreshTokenRequest) returns (RefreshTokenResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/auth/refresh-token"
+        };
+    }
+
+    rpc Update (UpdateUserRequest) returns (UpdateUserResponse) {
+        option (google.api.http) = {
+            patch: "/api/v1/user"
+        };
+    }
+
+    rpc GetSubscribedToPromotionUsers (GetSubscribedToPromotionUsersRequest) returns (GetSubscribedToPromotionUsersResponse) {
+        option (google.api.http) = {
+            get: "/admin/api/v1/user/promotion_subscribed"
+        };
+    }
+}

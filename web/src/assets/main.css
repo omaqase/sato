@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+
+:root {
+  --color-primary: #272838; /* Спокойный синий */
+  --color-primary-hover: #1e1f29; /* Темнее синий для hover */
+  --color-primary-focus: rgba(34, 108, 224, 0.2); /* Полупрозрачный синий для focus */
+
+  --color-secondary: #226ce0; /* Темно-серый */
+  --color-secondary-hover: #1a5db3; /* Темнее серый для hover */
+  --color-secondary-focus: rgba(34, 108, 224, 0.2); /* Полупрозрачный серый для focus */
+
+  --color-danger: #a31621; /* Красный */
+  --color-danger-hover: #8b131c; /* Темнее красный для hover */
+  --color-danger-focus: rgba(163, 22, 33, 0.2); /* Полупрозрачный красный для focus */
+
+  --color-background: #fefffe; /* Светло-серый фон */
+  --color-text: #272838; /* Темный текст */
+  --color-gray-light: #ffffff; /* Белый */
+  --color-gray-dark: #888888; /* Темно-серый */
+}
+
+body {
+  font-family: 'Satoshi', sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text);
+}

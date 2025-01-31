@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+option go_package = "github.com/omaqase/sato/product/pkg/api/v1/category;protobuf";
+package api.v1.category;
+
+// Request to create a category.
+message CreateCategoryRequest {
+  string title = 1 [json_name = "title"]; // Category Name.
+  string slug = 2 [json_name = "slug"];   // Unique URL-friendly identifier.
+}
+
+// Response to create a category.
+message CreateCategoryResponse {
+  string id = 1 [json_name = "id"];       // Unique category ID.
+  string title = 2 [json_name = "title"];
+  string slug = 3 [json_name = "slug"];
+}
+
+// Request to retrieve a category by ID.
+message GetCategoryByIdRequest {
+  string id = 1 [json_name = "id"];       // Unique category ID.
+}
+
+// Response to get a category by ID.
+message GetCategoryByIdResponse {
+  string id = 1 [json_name = "id"];
+  string title = 2 [json_name = "title"];
+  string slug = 3 [json_name = "slug"];
+}
+
+// Request to update the category.
+message UpdateCategoryRequest {
+  string id = 1 [json_name = "id"];       // Unique category ID.
+  string title = 2 [json_name = "title"];
+  string slug = 3 [json_name = "slug"];
+}
+
+// Responding to a category update.
+message UpdateCategoryResponse {
+  string id = 1 [json_name = "id"];
+  string title = 2 [json_name = "title"];
+  string slug = 3 [json_name = "slug"];
+}
+
+// Request to delete a category.
+message DeleteCategoryRequest {
+  oneof identifier {
+    string id = 1 [json_name = "id"];     // Unique category ID.
+    string slug = 2 [json_name = "slug"]; // Slug category.
+  }
+}
+
+// Response to category deletion.
+message DeleteCategoryResponse {
+  int32 status = 1;                       // Operation status (e.g. 0 - ok).
+}
+
+// Request to get a list of categories.
+message ListCategoriesRequest {
+  int32 page = 1 [json_name = "page"];    // Page number for pagination.
+  int32 limit = 2 [json_name = "limit"];  // Number of elements on the page.
+}
+
+// Response to get a list of categories.
+message ListCategoriesResponse {
+  repeated GetCategoryByIdResponse categories = 1 [json_name = "categories"];
+  int32 total_count = 2 [json_name = "total_count"]; // Total number of categories.
+}
