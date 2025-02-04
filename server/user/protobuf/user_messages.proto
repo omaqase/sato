@@ -1,0 +1,83 @@
+syntax = "proto3";
+option go_package = "github.com/omaqase/sato/user/pkg/api/v1/user;protobuf";
+package api.v1.user;
+
+import "google/protobuf/timestamp.proto";
+
+message SendOTPRequest {
+  string email = 1 [json_name = "email"];
+}
+
+message SendOTPResponse {
+  string otp_token = 1 [json_name = "otp_token"];
+}
+
+message VerifyOTPRequest {
+  string otp_token = 1 [json_name = "otp_token"];
+  string email = 2 [json_name = "email"];
+  string code = 3 [json_name = "code"];
+}
+
+message VerifyOTPResponse {
+  string access_token = 1 [json_name = "access_token"];
+  string refresh_token = 2 [json_name = "refresh_token"];
+  bool is_new_user = 3 [json_name = "is_new_user"];
+}
+
+message UpdateUserRequest {
+  optional string first_name = 1 [json_name = "first_name"];
+  optional string last_name = 2 [json_name = "last_name"];
+  optional string phone = 3 [json_name = "phone"];
+  optional bool promotions = 4 [json_name = "promotions"];
+}
+
+message UpdateUserResponse {
+  string first_name = 1 [json_name = "first_name"];
+  string last_name = 2 [json_name = "last_name"];
+  optional string phone = 3 [json_name = "phone"];
+  optional bool promotions = 4 [json_name = "promotions"];
+  string updated_at = 5 [json_name = "updated_at"];
+}
+
+message LogOutRequest {
+  string refresh_token = 1 [json_name = "refresh_token"];
+}
+
+message LogOutResponse {
+  int32 status = 1 [json_name = "status"];
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1 [json_name = "refresh_token"];
+}
+
+message RefreshTokenResponse {
+  string access_token = 1 [json_name = "access_token"];
+  string refresh_token = 2 [json_name = "refresh_token"];
+}
+
+message GetSubscribedToPromotionUsersRequest {
+  int32 limit = 1 [json_name = "limit"];
+  string cursor = 2 [json_name = "cursor"];
+}
+
+message GetSubscribedToPromotionUsersResponseItem {
+  string email = 1 [json_name = "email"];
+}
+
+message GetSubscribedToPromotionUsersResponse {
+  repeated GetSubscribedToPromotionUsersResponseItem emails = 1;
+}
+
+message GetUnverifiedEmailUsersRequest {
+  int32 limit = 1 [json_name = "limit"];
+  string cursor = 2 [json_name = "cursor"];
+}
+
+message GetUnverifiedEmailUsersResponseItem {
+  string email = 1 [json_name = "email"];
+}
+
+message GetUnverifiedEmailUsersResponse {
+  repeated GetUnverifiedEmailUsersResponseItem emails = 1 [json_name = "emails"];
+}

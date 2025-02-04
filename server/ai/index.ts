@@ -1,80 +1,96 @@
-require("dotenv").config();
-const express = require("express");
-const bodyParser = require("body-parser");
-const OpenAI = require("openai");
+import dotenv from "dotenv";
+import express from "express";
+import bodyParser from "body-parser";
+import OpenAI from "openai";
+import cors from "cors";
+import { sleep } from "bun";
+
+dotenv.config();
+
+const openai = new OpenAI({
+  baseURL: "https://openrouter.ai/api/v1",
+  apiKey:
+    "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", // Replace with your actual API key
+});
+
+async function retryWithBackoff(fn, retries = 5, delay = 1000) {
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (error.code === 429 && attempt < retries - 1) {
+        console.log(`Rate limited. Retrying in ${delay}ms...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        delay *= 2;
+      } else {
+        throw error;
+      }
+    }
+  }
+}
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware to parse JSON
 app.use(bodyParser.json());
+app.use(cors());
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY,
-  defaultHeaders: {
-    "HTTP-Referer": process.env.YOUR_SITE_URL, // Optional. Site URL for rankings on openrouter.ai.
-    "X-Title": process.env.YOUR_SITE_NAME, // Optional. Site title for rankings on openrouter.ai.
-  },
-});
-
-// Helper function to check if the query is within the allowed topics
-function isValidQuery(userMessage) {
-  const validKeywords = [
-    "заказ",
-    "доставка",
-    "статус",
-    "отмена",
-    "профиль",
-    "ошибка",
-    "не работает",
-    "проблема",
-  ];
-  return validKeywords.some((keyword) =>
-    userMessage.toLowerCase().includes(keyword)
-  );
-}
-
-// Route to handle user queries
 app.post("/ask", async (req, res) => {
-  const { message } = req.body;
+  const { prompt } = req.body;
 
-  if (!isValidQuery(message)) {
-    return res.json({
-      response:
-        "Извините, я могу помочь только с вопросами о заказах, профиле, информации о маркетплейсе Satori или ошибках на сайте. Пожалуйста, задайте вопрос по этим темам! 😊",
-    });
+  if (!prompt) {
+    return res.status(400).json({ error: "Prompt is required!" });
   }
+
+  res.setHeader("Content-Type", "text/plain");
+  res.setHeader("Transfer-Encoding", "chunked");
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: "google/gemini-2.0-flash-exp:free",
-      messages: [
-        {
-          role: "system",
-          content: `
-            Ты - Алуа, помощник для Satori Marketplace. Твоя задача - отвечать только на вопросы, связанные с заказами, профилем пользователя, информацией о маркетплейсе, пунктами самовывоза и ошибками на сайте.
-            Если вопрос не относится к этим темам, ответь: "Извините, я могу помочь только с вопросами о заказах, профиле, информации о маркетплейсе Satori или ошибках на сайте. Пожалуйста, задайте вопрос по этим темам! 😊"
-          `,
-        },
-        {
-          role: "user",
-          content: message,
-        },
-      ],
-    });
+    const completion = await retryWithBackoff(() =>
+      openai.chat.completions.create({
+        model: "sophosympatheia/rogue-rose-103b-v0.2:free",
+        stream: true,
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: prompt,
+              },
+            ],
+          },
+        ],
+      })
+    );
 
-    res.json({ response: completion.choices[0].message });
+    try {
+      for await (const chunk of completion) {
+        sleep(1000);
+        const choice = chunk.choices[0];
+        if (choice && choice.delta && choice.delta.content) {
+          const token = choice.delta.content;
+          console.log(token);
+          res.write(token);
+        }
+
+        if (choice.finish_reason === "stop") {
+          console.log("Stream finished.");
+          break;
+        }
+      }
+    } catch (err) {
+      console.error("Error processing stream:", err);
+      res.status(500).end("An error occurred while streaming the response.");
+    }
+
+    res.end();
   } catch (error) {
-    console.error("Error communicating with OpenAI:", error);
-    res.status(500).json({
-      error: "Произошла ошибка при обработке запроса. Попробуйте позже.",
-    });
+    console.error("Error during AI response generation:", error);
+    res.status(500).end("An error occurred while generating the response.");
   }
 });
 
-// Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });

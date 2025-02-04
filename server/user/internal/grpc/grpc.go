@@ -20,11 +20,10 @@ type Server struct {
 func StartGRPCServer(server *grpc.Server, listener net.Listener) error {
 	go func() {
 		if err := server.Serve(listener); err != nil {
-			grpclog.Fatalf("failed to serve: %s", err)
+			grpclog.Fatalf("failed to serve: %v", err)
 		}
 	}()
-
-	grpclog.Infof("grpc server serving on %s", listener.Addr())
+	grpclog.Infof("gRPC server serving on %s", listener.Addr())
 	return nil
 }
 
@@ -35,11 +34,9 @@ func StopGRPCServer(server *grpc.Server) error {
 
 func NewGRPCServer(lc fx.Lifecycle, service protobuf.UserServiceServer, config config.Config) (*Server, error) {
 	addr := fmt.Sprintf(":%s", config.App.Port)
-
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
-		grpclog.Fatalf("failed to listen tcp: %s", addr)
-		return nil, err
+		return nil, fmt.Errorf("failed to listen on TCP address %s: %w", addr, err)
 	}
 
 	server := grpc.NewServer()

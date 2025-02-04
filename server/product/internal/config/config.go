@@ -22,56 +22,47 @@ type AppConfig struct {
 }
 
 type DatabaseConfig struct {
-	Host         string
-	Port         int
-	User         string
-	Password     string
-	Database     string
-	MaxConns     int32
-	MinConns     int32
-	MaxConnIdle  time.Duration
-	MaxConnLife  time.Duration
-	QueryTimeout time.Duration
+	Host         string        `envconfig:"DB_HOST" required:"true"`
+	Port         int           `envconfig:"DB_PORT" default:"5432" required:"true"`
+	User         string        `envconfig:"DB_USER" required:"true"`
+	Password     string        `envconfig:"DB_PASSWORD" required:"true"`
+	Database     string        `envconfig:"DB_DATABASE" required:"true"`
+	MaxConns     int32         `envconfig:"DB_MAXCONNS" default:"10"`
+	MinConns     int32         `envconfig:"DB_MINCONNS" default:"5"`
+	MaxConnIdle  time.Duration `envconfig:"DB_MAXCONN_IDLE" default:"5m"`
+	MaxConnLife  time.Duration `envconfig:"DB_MAXCONNLIFE" default:"30m"`
+	QueryTimeout time.Duration `envconfig:"DB_QUERYTIMEOUT" default:"10s"`
 }
 
-func Load() (dest Config, err error) {
+func Load() (Config, error) {
 	root, err := os.Getwd()
 	if err != nil {
-		return dest, err
+		return Config{}, fmt.Errorf("failed to get working directory: %w", err)
+	}
+	if err := godotenv.Load(filepath.Join(root, ".env")); err != nil {
+		log.Printf("failed to load .env file: %v", err)
 	}
 
-	err = godotenv.Load(filepath.Join(root, ".env"))
-	if err != nil {
-		return dest, err
+	var cfg Config
+	if err := envconfig.Process("APP", &cfg.App); err != nil {
+		return Config{}, fmt.Errorf("failed to process app configuration: %w", err)
 	}
-
-	dest = Config{}
-
-	if err = envconfig.Process("APP", &dest.App); err != nil {
-		return dest, err
+	if err := envconfig.Process("DB", &cfg.Database); err != nil {
+		return Config{}, fmt.Errorf("failed to process database configuration: %w", err)
 	}
-
-	if err = envconfig.Process("DB", &dest.Database); err != nil {
-		return dest, err
-	}
-
-	return dest, err
+	return cfg, nil
 }
 
 func ProvidePGXConfig(c Config) (*pgxpool.Config, error) {
 	connString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable search_path=user_service",
 		c.Database.Host, c.Database.Port, c.Database.User, c.Database.Password, c.Database.Database)
-
 	poolConfig, err := pgxpool.ParseConfig(connString)
 	if err != nil {
-		log.Fatalf("failed to parse pgxpool config: %s; connection string: %s", err.Error(), connString)
-		return nil, err
+		return nil, fmt.Errorf("failed to parse pgxpool config: %w; connection string: %s", err, connString)
 	}
-
 	poolConfig.MaxConns = c.Database.MaxConns
 	poolConfig.MinConns = c.Database.MinConns
 	poolConfig.MaxConnIdleTime = c.Database.MaxConnIdle
 	poolConfig.MaxConnLifetime = c.Database.MaxConnLife
-
 	return poolConfig, nil
 }

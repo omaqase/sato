@@ -5,18 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/omaqase/sato/user/internal/domain"
-	"time"
 )
 
 type IUsersRepository interface {
-	Create(ctx context.Context, contract *CreateUserContract) (*domain.User, error)
-	Update(ctx context.Context, contract *UpdateUserContract) (*domain.User, error)
-	Delete(ctx context.Context, contract *DeleteUserContract) error
-	GetByCredentials(ctx context.Context, contract *GetUserByCredentialsContract) (*domain.User, error)
-	GetSubscribedToPromotions(ctx context.Context, contract *GetSubscribedToPromotionContract) ([]string, error)
+	Create(ctx context.Context, contract *CreateContract) (*domain.User, error)
+	Update(ctx context.Context, contract *UpdateContract) (*domain.User, error)
+	GetByEmail(ctx context.Context, contract *GetByEmailContract) (*domain.User, error)
 }
 
 type UsersRepository struct {
@@ -27,143 +23,82 @@ func NewUsersRepository(pgx *pgxpool.Pool) IUsersRepository {
 	return &UsersRepository{pgx: pgx}
 }
 
-func (r *UsersRepository) Create(ctx context.Context, contract *CreateUserContract) (*domain.User, error) {
-	user := &domain.User{}
-	now := time.Now().UTC()
+func (r *UsersRepository) Create(ctx context.Context, contract *CreateContract) (*domain.User, error) {
+	tx, err := r.pgx.Begin(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to begin transaction: %v", err)
+	}
+	defer func() {
+		if err != nil {
+			if rbErr := tx.Rollback(ctx); rbErr != nil {
+				err = fmt.Errorf("transaction rollback error: %v, original error: %w", rbErr, err)
+			}
+			return
+		}
+		err = tx.Commit(ctx)
+		if err != nil {
+			err = fmt.Errorf("failed to commit transaction: %w", err)
+		}
+	}()
 
-	err := r.pgx.QueryRow(ctx, createUserQuery,
-		contract.Email,
-		contract.Password,
-		contract.FirstName,
-		contract.LastName,
-		now,
-		now,
-	).Scan(
+	user := new(domain.User)
+
+	err = tx.QueryRow(ctx, createUserSQL, contract.Email, contract.FirstName, contract.LastName).Scan(
 		&user.ID,
 		&user.Email,
-		&user.FirstName,
-		&user.LastName,
-		&user.CreatedAt,
-		&user.UpdatedAt,
-		&user.IsSubscribedToPromotions,
+		&user.Role,
 	)
-
 	if err != nil {
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) {
-			switch pgErr.Code {
-			case "23505":
-				return nil, ErrInvalidSignUpCredentials
-			case "23514":
-				return nil, ErrValidationFailed
-			}
-		}
-		return nil, fmt.Errorf("%w: %v", ErrDatabaseInternalError, err)
+		return nil, fmt.Errorf("failed to insert user: %v", err)
 	}
 
 	return user, nil
 }
 
-func (r *UsersRepository) Update(ctx context.Context, contract *UpdateUserContract) (*domain.User, error) {
-	user := &domain.User{}
-
-	err := r.pgx.QueryRow(ctx, updateUserQuery,
-		contract.FirstName,
-		contract.LastName,
-		contract.Phone,
-		contract.IsSubscribedToPromotions,
-		contract.ID,
-	).Scan(
-		&user.ID,
-		&user.Email,
-		&user.FirstName,
-		&user.LastName,
-		&user.Phone,
-		&user.CreatedAt,
-		&user.UpdatedAt,
-		&user.IsSubscribedToPromotions,
-	)
-
+func (r *UsersRepository) Update(ctx context.Context, contract *UpdateContract) (*domain.User, error) {
+	tx, err := r.pgx.Begin(ctx)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, ErrUserNotFound
-		}
-
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) {
-			switch pgErr.Code {
-			case "23505":
-				return nil, ErrInvalidSignUpCredentials
-			case "22P02":
-				return nil, ErrValidationFailed
+		return nil, fmt.Errorf("failed to begin transaction: %v", err)
+	}
+	defer func() {
+		if err != nil {
+			if rbErr := tx.Rollback(ctx); rbErr != nil {
+				err = fmt.Errorf("transaction rollback error: %v, original error: %w", rbErr, err)
 			}
+			return
 		}
+		err = tx.Commit(ctx)
+		if err != nil {
+			err = fmt.Errorf("failed to commit transaction: %w", err)
+		}
+	}()
 
-		return nil, fmt.Errorf("%w: %v", ErrDatabaseInternalError, err)
+	row := tx.QueryRow(ctx, updateUserSQL, contract.FirstName, contract.LastName, contract.Phone, contract.Promotions, contract.ID)
+
+	user := new(domain.User)
+	if err := row.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Role, &user.Phone, &user.Promotions); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, fmt.Errorf("user with id %s not found or deleted: %v", contract.ID, err)
+		}
+		return nil, fmt.Errorf("failed to update user: %v", err)
 	}
 
 	return user, nil
 }
 
-func (r *UsersRepository) Delete(ctx context.Context, contract *DeleteUserContract) error {
-	var deletedAt time.Time
+func (r *UsersRepository) GetByEmail(ctx context.Context, contract *GetByEmailContract) (*domain.User, error) {
+	user := new(domain.User)
 
-	err := r.pgx.QueryRow(ctx, deleteUserQuery, contract.ID).Scan(&deletedAt)
-
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return ErrAlreadyDeleted
-		}
-
-		return fmt.Errorf("%w: %v", ErrDatabaseInternalError, err)
-	}
-
-	return nil
-}
-
-func (r *UsersRepository) GetByCredentials(ctx context.Context, contract *GetUserByCredentialsContract) (*domain.User, error) {
-	var user domain.User
-
-	err := r.pgx.QueryRow(ctx, getUserByCredentialsQuery, contract.Email).Scan(
+	err := r.pgx.QueryRow(ctx, getUserByEmailSQL, contract.Email).Scan(
 		&user.ID,
 		&user.Email,
-		&user.Password,
+		&user.Role,
 	)
-
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, ErrInvalidCredentials
+			return nil, fmt.Errorf("user with email %s not found: %v", contract.Email, err)
 		}
-
-		return nil, ErrDatabaseInternalError
+		return nil, fmt.Errorf("failed to execute query: %v", err)
 	}
-
-	if user.Password != contract.Password {
-		return nil, ErrInvalidCredentials
-	}
-
-	return &user, nil
-}
-
-func (r *UsersRepository) GetSubscribedToPromotions(ctx context.Context, contract *GetSubscribedToPromotionContract) ([]string, error) {
-	rows, err := r.pgx.Query(ctx, getUserSubscribedToPromotions, contract.Cursor, contract.Limit)
-	if err != nil {
-		return nil, ErrDatabaseInternalError
-	}
-	defer rows.Close()
-
-	emails := make([]string, 0, contract.Limit)
-	for rows.Next() {
-		var email string
-		if err := rows.Scan(&email); err != nil {
-			return nil, ErrDatabaseInternalError
-		}
-		emails = append(emails, email)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, ErrDatabaseInternalError
-	}
-
-	return emails, nil
+	return user, nil
 }

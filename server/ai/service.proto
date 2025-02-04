@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package ai_service;
+
+service AIService {
+  rpc Ask (stream AskRequest) returns (stream AskResponse);
+}
+
+message AskRequest {
+  string prompt = 1;
+}
+
+message AskResponse {
+  string token = 1;
+}

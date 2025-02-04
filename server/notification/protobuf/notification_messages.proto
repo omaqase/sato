@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option go_package = "github.com/omaqase/sato/notification/pkg/api/v1/notification;protobuf";
+
+package api.v1.notification;
+
+message SendNotificationRequest {
+  string receiver = 1 [json_name = "receiver"];
+  string username = 2 [json_name = "username"];
+  string content = 3 [json_name = "content"];
+  string support_link = 4 [json_name = "support_link"];
+}
+
+message SendNotificationResponse {
+  string id = 1 [json_name = "id"];
+}

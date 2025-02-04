@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "github.com/omaqase/sato/notification/pkg/api/v1/notification;protobuf";
+
+package api.v1.notification;
+
+import "notification_messages.proto";
+
+import "google/api/annotations.proto";
+
+service NotificationService {
+  rpc Send(SendNotificationRequest) returns (SendNotificationResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/notification/send",
+      body: "*"
+    };
+  }
+}

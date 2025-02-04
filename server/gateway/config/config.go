@@ -11,24 +11,30 @@ import (
 type Config struct {
 	App                 AppConfig
 	NotificationService NotificationServiceConfig
+	UserService         UserServiceConfig
 	Security            SecurityConfig
 }
 
 type AppConfig struct {
-	Environment string `envconfig:"APP_ENV" required:"true"`
-	Port        string `envconfig:"APP_PORT" default:"8080" required:"true"`
+	Environment string
+	Port        string
 }
 
 type NotificationServiceConfig struct {
-	Host string `envconfig:"NOTIFICATION_SERVICE_HOST"`
-	Port string `envconfig:"NOTIFICATION_SERVICE_PORT" default:"5050"`
+	Host string
+	Port string
+}
+
+type UserServiceConfig struct {
+	Host string
+	Port string
 }
 
 type SecurityConfig struct {
-	SigningKey string `envconfig:"SECURITY_SIGNING_KEY"`
+	SigningKey string
 }
 
-func Load() (dest *Config, err error) {
+func Load() (dest Config, err error) {
 	root, err := os.Getwd()
 	if err != nil {
 		return dest, err
@@ -39,11 +45,17 @@ func Load() (dest *Config, err error) {
 		return dest, err
 	}
 
+	dest = Config{}
+
 	if err = envconfig.Process("APP", &dest.App); err != nil {
 		return dest, err
 	}
 
 	if err = envconfig.Process("NOTIFICATION_SERVICE", &dest.NotificationService); err != nil {
+		return dest, err
+	}
+
+	if err = envconfig.Process("USER_SERVICE", &dest.UserService); err != nil {
 		return dest, err
 	}
 

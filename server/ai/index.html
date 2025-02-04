@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Streaming AI Response Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #output {
+      white-space: pre-wrap; /* Preserve newlines and spaces */
+      border: 1px solid #ccc;
+      padding: 10px;
+      min-height: 100px;
+      margin-top: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test Streaming AI Response</h1>
+  <label for="prompt">Enter your prompt:</label><br>
+  <input type="text" id="prompt" placeholder="e.g., Explain gravity" style="width: 300px; padding: 5px; margin-top: 10px;">
+  <button onclick="sendRequest()">Send Request</button>
+
+  <h2>Response:</h2>
+  <div id="output"></div>
+
+  <script>
+    async function sendRequest() {
+      const prompt = document.getElementById("prompt").value;
+      if (!prompt) {
+        alert("Please enter a prompt!");
+        return;
+      }
+
+      // Clear previous output
+      const outputDiv = document.getElementById("output");
+      outputDiv.textContent = "Waiting for response...\n";
+
+      try {
+        const response = await fetch("http://localhost:3000/ask", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ prompt }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        // Use ReadableStream to process chunks
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let result = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) {
+            outputDiv.textContent += "\n[Stream complete]";
+            break;
+          }
+          const chunk = decoder.decode(value, { stream: true });
+          result += chunk;
+          outputDiv.textContent = result; // Update the output in real-time
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        outputDiv.textContent = `Error: ${error.message}`;
+      }
+    }
+  </script>
+</body>
+</html>

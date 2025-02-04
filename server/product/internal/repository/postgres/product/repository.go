@@ -31,7 +31,6 @@ func NewProductRepository(pgx *pgxpool.Pool) IProductRepository {
 func (r *ProductRepository) CreateProduct(ctx context.Context, contract *CreateProductContract) (*domain.Product, error) {
 	product := &domain.Product{}
 	now := time.Now().UTC()
-
 	err := r.pgx.QueryRow(ctx, createProductQuery,
 		contract.Title,
 		contract.Description,
@@ -48,17 +47,14 @@ func (r *ProductRepository) CreateProduct(ctx context.Context, contract *CreateP
 		&product.CreatedAt,
 		&product.UpdatedAt,
 	)
-
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", postgres.ErrDatabaseInternalError, err)
 	}
-
 	return product, nil
 }
 
 func (r *ProductRepository) GetProductByID(ctx context.Context, id uuid.UUID) (*domain.Product, error) {
 	product := &domain.Product{}
-
 	err := r.pgx.QueryRow(ctx, getProductByIDQuery, id).Scan(
 		&product.ID,
 		&product.Title,
@@ -68,20 +64,17 @@ func (r *ProductRepository) GetProductByID(ctx context.Context, id uuid.UUID) (*
 		&product.CreatedAt,
 		&product.UpdatedAt,
 	)
-
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, postgres.ErrProductNotFound
+	}
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, postgres.ErrProductNotFound
-		}
 		return nil, fmt.Errorf("%w: %v", postgres.ErrDatabaseInternalError, err)
 	}
-
 	return product, nil
 }
 
 func (r *ProductRepository) UpdateProduct(ctx context.Context, contract *UpdateProductContract) (*domain.Product, error) {
 	product := &domain.Product{}
-
 	err := r.pgx.QueryRow(ctx, updateProductQuery,
 		contract.Title,
 		contract.Description,
@@ -97,14 +90,12 @@ func (r *ProductRepository) UpdateProduct(ctx context.Context, contract *UpdateP
 		&product.CreatedAt,
 		&product.UpdatedAt,
 	)
-
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, postgres.ErrProductNotFound
+	}
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, postgres.ErrProductNotFound
-		}
 		return nil, fmt.Errorf("%w: %v", postgres.ErrDatabaseInternalError, err)
 	}
-
 	return product, nil
 }
 
@@ -113,17 +104,14 @@ func (r *ProductRepository) DeleteProduct(ctx context.Context, contract *DeleteP
 	if err != nil {
 		return fmt.Errorf("%w: %v", postgres.ErrDatabaseInternalError, err)
 	}
-
 	if result.RowsAffected() == 0 {
 		return postgres.ErrAlreadyDeleted
 	}
-
 	return nil
 }
 
 func (r *ProductRepository) ListProducts(ctx context.Context, contract *ListProductsContract) ([]*domain.Product, int, error) {
 	offset := (contract.Page - 1) * contract.Limit
-
 	rows, err := r.pgx.Query(ctx, listProductsQuery, contract.Limit, offset)
 	if err != nil {
 		return nil, 0, fmt.Errorf("%w: %v", postgres.ErrDatabaseInternalError, err)
@@ -147,7 +135,6 @@ func (r *ProductRepository) ListProducts(ctx context.Context, contract *ListProd
 		}
 		products = append(products, product)
 	}
-
 	if err := rows.Err(); err != nil {
 		return nil, 0, fmt.Errorf("%w: %v", postgres.ErrDatabaseInternalError, err)
 	}
@@ -160,6 +147,5 @@ func (r *ProductRepository) ListProducts(ctx context.Context, contract *ListProd
 	if err != nil {
 		return nil, 0, fmt.Errorf("%w: %v", postgres.ErrDatabaseInternalError, err)
 	}
-
 	return products, totalCount, nil
 }

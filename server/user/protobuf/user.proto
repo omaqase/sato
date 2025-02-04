@@ -1,23 +1,22 @@
 syntax = "proto3";
-
 option go_package = "github.com/omaqase/sato/user/pkg/api/v1/user;protobuf";
-
 package api.v1.user;
 
-import "category_messages.proto";
-
+import "user_messages.proto";
 import "google/api/annotations.proto";
 
 service UserService {
-    rpc SignUp (SignUpRequest) returns (SignUpResponse) {
+    rpc SendOTP (SendOTPRequest) returns (SendOTPResponse) {
         option (google.api.http) = {
-            post: "/api/v1/auth/sign-up"
+            post: "/api/v1/auth/send-otp",
+            body: "*"
         };
     }
 
-    rpc SignIn (SignInRequest) returns (SignInResponse) {
+    rpc VerifyOTP (VerifyOTPRequest) returns (VerifyOTPResponse) {
         option (google.api.http) = {
-            post: "/api/v1/auth/sign-in"
+            post: "/api/v1/auth/verify-otp",
+            body: "*"
         };
     }
 
@@ -35,13 +34,19 @@ service UserService {
 
     rpc Update (UpdateUserRequest) returns (UpdateUserResponse) {
         option (google.api.http) = {
-            patch: "/api/v1/user"
+            patch: "/api/v1/user",
+            body: "*"
         };
     }
-
     rpc GetSubscribedToPromotionUsers (GetSubscribedToPromotionUsersRequest) returns (GetSubscribedToPromotionUsersResponse) {
         option (google.api.http) = {
             get: "/admin/api/v1/user/promotion_subscribed"
+        };
+    }
+
+    rpc GetUnverifiedEmailUsers (GetUnverifiedEmailUsersRequest) returns (GetUnverifiedEmailUsersResponse) {
+        option (google.api.http) = {
+            get: "/admin/api/v1/user/unverified_emails"
         };
     }
 }

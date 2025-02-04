@@ -25,13 +25,13 @@ type CategoryRepository struct {
 	pgx *pgxpool.Pool
 }
 
-func NewRepository(pgx *pgxpool.Pool) ICategoryRepository {
+func NewCategoryRepository(pgx *pgxpool.Pool) ICategoryRepository {
 	return &CategoryRepository{pgx: pgx}
 }
+
 func (r *CategoryRepository) CreateCategory(ctx context.Context, contract *CreateCategoryContract) (*domain.Category, error) {
 	category := &domain.Category{}
 	now := time.Now().UTC()
-
 	err := r.pgx.QueryRow(ctx, createCategoryQuery,
 		contract.Title,
 		contract.Slug,
@@ -44,7 +44,6 @@ func (r *CategoryRepository) CreateCategory(ctx context.Context, contract *Creat
 		&category.CreatedAt,
 		&category.UpdatedAt,
 	)
-
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
@@ -52,13 +51,11 @@ func (r *CategoryRepository) CreateCategory(ctx context.Context, contract *Creat
 		}
 		return nil, fmt.Errorf("%w: %v", postgres.ErrDatabaseInternalError, err)
 	}
-
 	return category, nil
 }
 
 func (r *CategoryRepository) GetCategoryByID(ctx context.Context, id uuid.UUID) (*domain.Category, error) {
 	category := &domain.Category{}
-
 	err := r.pgx.QueryRow(ctx, getCategoryByIDQuery, id).Scan(
 		&category.ID,
 		&category.Title,
@@ -66,20 +63,17 @@ func (r *CategoryRepository) GetCategoryByID(ctx context.Context, id uuid.UUID) 
 		&category.CreatedAt,
 		&category.UpdatedAt,
 	)
-
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, postgres.ErrCategoryNotFound
+	}
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, postgres.ErrCategoryNotFound
-		}
 		return nil, fmt.Errorf("%w: %v", postgres.ErrDatabaseInternalError, err)
 	}
-
 	return category, nil
 }
 
 func (r *CategoryRepository) UpdateCategory(ctx context.Context, contract *UpdateCategoryContract) (*domain.Category, error) {
 	category := &domain.Category{}
-
 	err := r.pgx.QueryRow(ctx, updateCategoryQuery,
 		contract.Title,
 		contract.Slug,
@@ -91,25 +85,22 @@ func (r *CategoryRepository) UpdateCategory(ctx context.Context, contract *Updat
 		&category.CreatedAt,
 		&category.UpdatedAt,
 	)
-
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, postgres.ErrCategoryNotFound
+	}
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+		return nil, postgres.ErrInvalidSlug
+	}
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, postgres.ErrCategoryNotFound
-		}
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
-			return nil, postgres.ErrInvalidSlug
-		}
 		return nil, fmt.Errorf("%w: %v", postgres.ErrDatabaseInternalError, err)
 	}
-
 	return category, nil
 }
 
 func (r *CategoryRepository) DeleteCategory(ctx context.Context, contract *DeleteCategoryContract) error {
 	var query string
 	var args []interface{}
-
 	if contract.ID != nil {
 		query = deleteCategoryQuery
 		args = []interface{}{*contract.ID}
@@ -122,22 +113,18 @@ func (r *CategoryRepository) DeleteCategory(ctx context.Context, contract *Delet
 	} else {
 		return errors.New("either ID or Slug must be provided")
 	}
-
 	result, err := r.pgx.Exec(ctx, query, args...)
 	if err != nil {
 		return fmt.Errorf("%w: %v", postgres.ErrDatabaseInternalError, err)
 	}
-
 	if result.RowsAffected() == 0 {
 		return postgres.ErrAlreadyDeleted
 	}
-
 	return nil
 }
 
 func (r *CategoryRepository) ListCategories(ctx context.Context, contract *ListCategoriesContract) ([]*domain.Category, int, error) {
 	offset := (contract.Page - 1) * contract.Limit
-
 	rows, err := r.pgx.Query(ctx, listCategoriesQuery, contract.Limit, offset)
 	if err != nil {
 		return nil, 0, fmt.Errorf("%w: %v", postgres.ErrDatabaseInternalError, err)
@@ -159,7 +146,6 @@ func (r *CategoryRepository) ListCategories(ctx context.Context, contract *ListC
 		}
 		categories = append(categories, category)
 	}
-
 	if err := rows.Err(); err != nil {
 		return nil, 0, fmt.Errorf("%w: %v", postgres.ErrDatabaseInternalError, err)
 	}
@@ -172,6 +158,5 @@ func (r *CategoryRepository) ListCategories(ctx context.Context, contract *ListC
 	if err != nil {
 		return nil, 0, fmt.Errorf("%w: %v", postgres.ErrDatabaseInternalError, err)
 	}
-
 	return categories, totalCount, nil
 }
