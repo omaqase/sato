@@ -318,6 +318,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 const product = ref({
+  id: 1,
   name: 'Apple iPhone 13 Pro 256GB',
   price: 89990,
   oldPrice: 99990,

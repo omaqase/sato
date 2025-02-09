@@ -69,11 +69,14 @@
 </template>
 
 <script setup lang="ts">
+import TruckIcon from '@/components/icons/TruckIcon.vue'
+
 const paymentMethods = [
   {
     id: 1,
     title: 'Банковские карты',
     description: 'Оплачивайте заказы любой банковской картой через защищенное соединение',
+    icon: TruckIcon,
     options: [
       { name: 'Visa', logo: '/images/payment/visa.svg' },
       { name: 'Mastercard', logo: '/images/payment/mastercard.svg' },
@@ -85,6 +88,7 @@ const paymentMethods = [
     id: 2,
     title: 'Электронные кошельки',
     description: 'Используйте популярные электронные кошельки для оплаты',
+    icon: TruckIcon,
     options: [
       { name: 'ЮMoney', logo: '/images/payment/ymoney.svg' },
       { name: 'QIWI', logo: '/images/payment/qiwi.svg' },
@@ -94,6 +98,7 @@ const paymentMethods = [
     id: 3,
     title: 'Оплата при получении',
     description: 'Оплатите заказ при получении наличными или картой',
+    icon: TruckIcon,
     features: ['Оплата после проверки товара', 'Наличные или карта', 'Кассовый чек'],
   },
 ]

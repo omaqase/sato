@@ -86,6 +86,8 @@
 </template>
 
 <script setup lang="ts">
+import TruckIcon from '@/components/icons/TruckIcon.vue'
+
 const deliveryMethods = [
   {
     id: 1,
@@ -93,6 +95,7 @@ const deliveryMethods = [
     description: 'Доставка до двери в удобное время',
     price: 'от 299 ₽',
     time: '1-2 дня',
+    icon: TruckIcon,
     features: ['Доставка до двери', 'Выбор удобного времени', 'SMS-уведомления о статусе'],
   },
   {
@@ -101,6 +104,7 @@ const deliveryMethods = [
     description: 'Получение заказа в ближайшем пункте выдачи',
     price: 'от 199 ₽',
     time: '1-3 дня',
+    icon: TruckIcon,
     features: ['Более 1000 пунктов выдачи', 'Примерка перед покупкой', 'Хранение заказа 7 дней'],
   },
   {
@@ -109,6 +113,7 @@ const deliveryMethods = [
     description: 'Доставка в любую точку России',
     price: 'от 299 ₽',
     time: '3-14 дней',
+    icon: TruckIcon,
     features: ['Доставка по всей России', 'Наложенный платеж', 'Трекинг отправления'],
   },
 ]
