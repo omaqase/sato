@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import { dashboardRoutes } from './dashboard'
+import { authMiddleware } from './middleware'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,11 +25,17 @@ const router = createRouter({
       path: '/account',
       name: 'account-profile',
       component: () => import('../modules/public/views/profile/ProfileView.vue'),
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: '/account/orders',
       name: 'account-orders',
       component: () => import('../modules/public/views/profile/OrdersView.vue'),
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: '/account/notifications',
@@ -124,7 +132,10 @@ const router = createRouter({
       name: 'product',
       component: () => import('@/modules/public/views/ProductView.vue'),
     },
+    ...dashboardRoutes,
   ],
 })
+
+router.beforeEach(authMiddleware)
 
 export default router

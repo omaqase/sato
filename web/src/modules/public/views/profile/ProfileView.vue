@@ -93,6 +93,25 @@
 
         <!-- Content -->
         <div class="flex-1 space-y-8">
+          <!-- User Info -->
+          <div class="bg-white rounded-2xl p-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Профиль</h2>
+            <div class="space-y-4">
+              <div>
+                <p class="text-sm text-gray-500">Email</p>
+                <p class="font-medium">{{ user?.email }}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">Имя</p>
+                <p class="font-medium">{{ user?.first_name || 'Не указано' }}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">Фамилия</p>
+                <p class="font-medium">{{ user?.last_name || 'Не указана' }}</p>
+              </div>
+            </div>
+          </div>
+
           <!-- Stats Grid -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div
@@ -185,7 +204,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/useAuthStore'
+import { storeToRefs } from 'pinia'
+
+const authStore = useAuthStore()
+const { user } = storeToRefs(authStore)
 
 const menuItems = [
   {
@@ -228,9 +252,9 @@ const menuItems = [
 const stats = [
   {
     id: 1,
-    name: 'Активные заказы',
-    value: '3',
-    icon: 'ShoppingBagIcon',
+    name: 'Имя',
+    value: user.value?.first_name || 'Не указано',
+    icon: 'UserIcon',
     bgColor: 'bg-blue-50',
     iconColor: 'text-blue-600',
   },

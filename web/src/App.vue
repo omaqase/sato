@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
-import AppHeader from './modules/public/components/AppHeader.vue'
-import AppFooter from './components/AppFooter.vue'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import DashboardLayout from '@/modules/dashboard/layouts/DashboardLayout.vue'
+
+const route = useRoute()
+const layout = computed(() => {
+  return route.meta.layout === 'dashboard' ? DashboardLayout : DefaultLayout
+})
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen">
-    <AppHeader />
-    <main class="flex-1">
-      <router-view></router-view>
-    </main>
-    <AppFooter />
-  </div>
+  <component :is="layout">
+    <router-view />
+  </component>
 </template>
