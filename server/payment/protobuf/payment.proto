@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option go_package = "github.com/omaqase/sato/payment/pkg/api/v1/payment;protobuf";
+
+package api.v1.payment;
+
+import "google/api/annotations.proto";
+
+import "payment_messages.proto";
+
+service PaymentService {
+  rpc AddPaymentMethod (AddPaymentMethodRequest) returns (AddPaymentMethodResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/payment",
+      body: "*"
+    };
+  }
+
+  rpc ProcessPayment (ProcessPaymentRequest) returns (ProcessPaymentResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/payment/process",
+      body: "*"
+    };
+  }
+}

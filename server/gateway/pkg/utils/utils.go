@@ -7,9 +7,14 @@ import (
 	"strings"
 )
 
-func ParseJWT(signingKey, accessToken string) (string, error) {
+type TokenClaims struct {
+	Sub  string `json:"sub"`
+	Role string `json:"role"`
+}
+
+func ParseJWT(signingKey, accessToken string) (*TokenClaims, error) {
 	if accessToken == "" || !strings.HasPrefix(accessToken, "Bearer ") {
-		return "", errors.New("invalid token prefix")
+		return nil, errors.New("invalid token prefix")
 	}
 	accessToken = strings.TrimPrefix(accessToken, "Bearer ")
 
@@ -20,18 +25,29 @@ func ParseJWT(signingKey, accessToken string) (string, error) {
 		return []byte(signingKey), nil
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
-		return "", errors.New("invalid token")
+		return nil, errors.New("invalid token")
 	}
+
+	tokenClaims := new(TokenClaims)
 
 	sub, ok := claims["sub"].(string)
 	if !ok || sub == "" {
-		return "", errors.New("subject (sub) not found in token claims")
+		return nil, errors.New("subject (sub) not found in token claims")
 	}
 
-	return sub, nil
+	tokenClaims.Sub = sub
+
+	role, ok := claims["role"].(string)
+	if !ok || role == "" {
+		return nil, errors.New("role (role) not found in token claims")
+	}
+
+	tokenClaims.Role = role
+
+	return tokenClaims, nil
 }

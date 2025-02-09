@@ -12,6 +12,7 @@ type Config struct {
 	App                 AppConfig
 	NotificationService NotificationServiceConfig
 	UserService         UserServiceConfig
+	ProductService      ProductServiceConfig
 	Security            SecurityConfig
 }
 
@@ -26,6 +27,11 @@ type NotificationServiceConfig struct {
 }
 
 type UserServiceConfig struct {
+	Host string
+	Port string
+}
+
+type ProductServiceConfig struct {
 	Host string
 	Port string
 }
@@ -56,6 +62,10 @@ func Load() (dest Config, err error) {
 	}
 
 	if err = envconfig.Process("USER_SERVICE", &dest.UserService); err != nil {
+		return dest, err
+	}
+
+	if err = envconfig.Process("PRODUCT_SERVICE", &dest.ProductService); err != nil {
 		return dest, err
 	}
 

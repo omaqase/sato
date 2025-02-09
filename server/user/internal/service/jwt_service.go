@@ -10,7 +10,7 @@ import (
 )
 
 type IJWTService interface {
-	NewJWT(userID string, ttl time.Duration) (string, error)
+	NewJWT(userID, role string, ttl time.Duration) (string, error)
 	Parse(accessToken string) (string, error)
 	NewRefreshToken() (string, error)
 }
@@ -23,11 +23,20 @@ func NewJWTService(config config.Config) IJWTService {
 	return &JWTService{Config: config}
 }
 
-func (s JWTService) NewJWT(userID string, ttl time.Duration) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(ttl)),
-		Subject:   userID,
-	})
+type CustomClaims struct {
+	Role string `json:"role"`
+	jwt.RegisteredClaims
+}
+
+func (s JWTService) NewJWT(userID, role string, ttl time.Duration) (string, error) {
+	claims := CustomClaims{
+		Role: role,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(ttl)),
+			Subject:   userID,
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(s.Config.Security.JWTSigningKey))
 }
 

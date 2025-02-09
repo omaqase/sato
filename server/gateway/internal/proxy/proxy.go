@@ -3,15 +3,20 @@ package proxy
 import (
 	"context"
 	"fmt"
+	protobuf "github.com/omaqase/sato/gateway/pkg/api/v1/catalogue"
+	"log"
+	"net/http"
+	"slices"
+
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/omaqase/sato/gateway/config"
+	notificationService "github.com/omaqase/sato/gateway/pkg/api/v1/notification"
 	userService "github.com/omaqase/sato/gateway/pkg/api/v1/user"
 	"github.com/omaqase/sato/gateway/pkg/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/grpclog"
-	"log"
-	"net/http"
+	"google.golang.org/protobuf/proto"
 )
 
 type Proxy struct {
@@ -19,13 +24,35 @@ type Proxy struct {
 	Config config.Config
 }
 
+// Новый конструктор с дополнительной опцией для обработки ServerMetadata.
 func NewProxy(config config.Config) *Proxy {
-	return &Proxy{Mux: runtime.NewServeMux(), Config: config}
+	// Используем опцию WithForwardResponseOption, чтобы обработать ситуацию,
+	// когда ServerMetadata отсутствует в контексте.
+	mux := runtime.NewServeMux(
+		runtime.WithForwardResponseOption(func(ctx context.Context, w http.ResponseWriter, resp proto.Message) error {
+			// Пытаемся извлечь ServerMetadata. Если его нет, ничего не делаем.
+			_, ok := runtime.ServerMetadataFromContext(ctx)
+			if !ok {
+				// Можно залогировать, что metadata не найдены (если нужно).
+				grpclog.Warning("ServerMetadata not found in context")
+			}
+			return nil
+		}),
+	)
+	return &Proxy{Mux: mux, Config: config}
 }
 
 func (p *Proxy) RegisterServices(ctx context.Context) error {
 	if err := p.registerUserService(ctx); err != nil {
 		return fmt.Errorf("failed to register user service: %w", err)
+	}
+
+	if err := p.registerNotificationService(ctx); err != nil {
+		return fmt.Errorf("failed to register notification service: %w", err)
+	}
+
+	if err := p.registerProductService(ctx); err != nil {
+		return fmt.Errorf("failed to register product service: %w", err)
 	}
 
 	return nil
@@ -36,6 +63,32 @@ func (p *Proxy) registerUserService(ctx context.Context) error {
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 
 	if err := userService.RegisterUserServiceHandlerFromEndpoint(ctx, p.Mux, endpoint, opts); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *Proxy) registerNotificationService(ctx context.Context) error {
+	endpoint := fmt.Sprintf("%s:%s", p.Config.NotificationService.Host, p.Config.NotificationService.Port)
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+
+	if err := notificationService.RegisterNotificationServiceHandlerFromEndpoint(ctx, p.Mux, endpoint, opts); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *Proxy) registerProductService(ctx context.Context) error {
+	endpoint := fmt.Sprintf("%s:%s", p.Config.ProductService.Host, p.Config.ProductService.Port)
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+
+	if err := protobuf.RegisterCategoryServiceHandlerFromEndpoint(ctx, p.Mux, endpoint, opts); err != nil {
+		return err
+	}
+
+	if err := protobuf.RegisterProductServiceHandlerFromEndpoint(ctx, p.Mux, endpoint, opts); err != nil {
 		return err
 	}
 
@@ -58,8 +111,8 @@ func AuthenticationMiddleware(next http.Handler) http.Handler {
 		}
 
 		publicPaths := map[string]bool{
-			"/api/v1/auth/sign-in":  true,
-			"/api/v	1/auth/sign-up": true,
+			"/api/v1/auth/send-otp":   true,
+			"/api/v1/auth/verify-otp": true,
 		}
 
 		if publicPaths[r.URL.Path] {
@@ -69,14 +122,21 @@ func AuthenticationMiddleware(next http.Handler) http.Handler {
 
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
-			log.Println("dqwew")
-			log.Println(authHeader)
 			http.Error(w, "You are unauthorized", http.StatusUnauthorized)
 			return
 		}
 
-		_, err := utils.ParseJWT("qxwneiqwheuiys", authHeader)
+		claims, err := utils.ParseJWT("qxwneiqwheuiys", authHeader)
 		if err != nil {
+			http.Error(w, "You are unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		roles := GetRequiredRoles(r.URL.Path)
+
+		if !slices.Contains(roles, claims.Role) {
+			log.Println(roles)
+			log.Println(claims.Role)
 			http.Error(w, "You are unauthorized", http.StatusUnauthorized)
 			return
 		}

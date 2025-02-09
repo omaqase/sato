@@ -2,9 +2,9 @@ package session
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/goccy/go-json"
 	"github.com/omaqase/sato/user/internal/domain"
 	"github.com/redis/go-redis/v9"
 	"time"

@@ -1,0 +1,170 @@
+syntax = "proto3";
+
+option go_package = "github.com/omaqase/sato/catalogue/pkg/api/v1/catalogue;protobuf";
+
+package api.v1.catalogue;
+
+// Category
+
+message CreateCategoryRequest {
+  string title = 1;
+  string slug = 2;
+}
+
+message CreateCategoryResponse {
+  string id = 1;
+  string title = 2;
+  string slug = 3;
+  string created_at = 4;
+}
+
+message UpdateCategoryRequest {
+  string category_id = 1;
+  optional string title = 2;
+  optional string slug = 3;
+}
+
+message UpdateCategoryResponse {
+  string category_id = 1;
+  string title = 2;
+  string slug = 3;
+  string updated_at = 4;
+}
+
+message GetCategoryByIDRequest {
+  string category_id = 1;
+}
+
+message GetCategoryByIDResponse {
+  string category_id = 1;
+  string title = 2;
+  string slug = 3;
+  string created_at = 4;
+  string updated_at = 5;
+}
+
+message GetCategoryBySlugRequest {
+  string slug = 1;
+}
+
+message GetCategoryBySlugResponse {
+  string category_id = 1;
+  string title = 2;
+  string slug = 3;
+  string created_at = 4;
+  string updated_at = 5;
+}
+
+message ListCategoryRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+message ListCategoryItem {
+  string category_id = 1;
+  string title = 2;
+  string slug = 3;
+  string created_at = 4;
+  string updated_at = 5;
+}
+
+message ListCategoryResponse {
+  repeated ListCategoryItem categories = 1;
+}
+
+message DeleteCategoryByIDRequest {
+  string category_id = 1;
+}
+
+message DeleteCategoryByIDResponse {
+  int32 status = 1;
+}
+
+message DeleteCategoryBySlugRequest {
+  string slug = 1;
+}
+
+message DeleteCategoryBySlugResponse {
+  int32 status = 1;
+}
+
+// Product
+
+message CreateProductRequest {
+  string category_id = 1;
+  string title = 2;
+  int32 stock = 3;
+}
+
+message CreateProductResponse {
+  string product_id = 1;
+  string category_id = 2;
+  string seller_id = 3;
+  string title = 4;
+  int32 stock = 5;
+  float rating = 6;
+  bool approved = 7;
+  string created_at = 8;
+}
+
+message UpdateProductRequest {
+  string product_id = 1;
+  optional string title = 2;
+  optional int32 stock = 3;
+}
+
+message UpdateProductResponse {
+  string product_id = 1;
+  string category_id = 2;
+  string seller_id = 3;
+  string title = 4;
+  int32 stock = 5;
+  float rating = 6;
+  bool approved = 7;
+  string updated_at = 8;
+}
+
+message GetProductByIDRequest {
+  string product_id = 1;
+}
+
+message GetProductByIDResponse {
+  string product_id = 1;
+  string category_id = 2;
+  string seller_id = 3;
+  string title = 4;
+  int32 stock = 5;
+  float rating = 6;
+  bool approved = 7;
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+message ListProductRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+message ListProductItem {
+  string product_id = 1;
+  string category_id = 2;
+  string seller_id = 3;
+  string title = 4;
+  int32 stock = 5;
+  float rating = 6;
+  bool approved = 7;
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+message ListProductResponse {
+  repeated ListProductItem products = 1;
+}
+
+message DeleteProductRequest {
+  string product_id = 1;
+}
+
+message DeleteProductResponse {
+  int32 status = 1;
+}

@@ -1,9 +1,7 @@
 package postgres
 
 type CreateContract struct {
-	Email     string
-	FirstName string
-	LastName  string
+	Email string
 }
 
 type GetByEmailContract struct {

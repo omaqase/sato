@@ -40,13 +40,9 @@ service UserService {
     }
     rpc GetSubscribedToPromotionUsers (GetSubscribedToPromotionUsersRequest) returns (GetSubscribedToPromotionUsersResponse) {
         option (google.api.http) = {
-            get: "/admin/api/v1/user/promotion_subscribed"
+            get: "/admin/api/v1/user/promotion_subscribed",
         };
     }
 
-    rpc GetUnverifiedEmailUsers (GetUnverifiedEmailUsersRequest) returns (GetUnverifiedEmailUsersResponse) {
-        option (google.api.http) = {
-            get: "/admin/api/v1/user/unverified_emails"
-        };
-    }
+    rpc ParseJWT (ParseJWTRequest) returns (ParseJWTResponse);
 }

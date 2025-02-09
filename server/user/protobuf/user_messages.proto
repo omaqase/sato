@@ -9,11 +9,11 @@ message SendOTPRequest {
 }
 
 message SendOTPResponse {
-  string otp_token = 1 [json_name = "otp_token"];
+  string token = 1 [json_name = "token"];
 }
 
 message VerifyOTPRequest {
-  string otp_token = 1 [json_name = "otp_token"];
+  string token = 1 [json_name = "token"];
   string email = 2 [json_name = "email"];
   string code = 3 [json_name = "code"];
 }
@@ -58,26 +58,23 @@ message RefreshTokenResponse {
 
 message GetSubscribedToPromotionUsersRequest {
   int32 limit = 1 [json_name = "limit"];
-  string cursor = 2 [json_name = "cursor"];
+  int32 offset = 2 [json_name = "offset"];
 }
 
 message GetSubscribedToPromotionUsersResponseItem {
   string email = 1 [json_name = "email"];
+  string first_name = 2 [json_name = "first_name"];
+  string last_name = 3 [json_name = "last_name"];
 }
 
 message GetSubscribedToPromotionUsersResponse {
   repeated GetSubscribedToPromotionUsersResponseItem emails = 1;
 }
 
-message GetUnverifiedEmailUsersRequest {
-  int32 limit = 1 [json_name = "limit"];
-  string cursor = 2 [json_name = "cursor"];
+message ParseJWTRequest {
+  string access_token = 1;
 }
 
-message GetUnverifiedEmailUsersResponseItem {
-  string email = 1 [json_name = "email"];
-}
-
-message GetUnverifiedEmailUsersResponse {
-  repeated GetUnverifiedEmailUsersResponseItem emails = 1 [json_name = "emails"];
+message ParseJWTResponse {
+  string user_id = 1;
 }

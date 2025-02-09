@@ -7,12 +7,15 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/omaqase/sato/user/internal/domain"
+	"log"
+	"time"
 )
 
 type IUsersRepository interface {
 	Create(ctx context.Context, contract *CreateContract) (*domain.User, error)
 	Update(ctx context.Context, contract *UpdateContract) (*domain.User, error)
 	GetByEmail(ctx context.Context, contract *GetByEmailContract) (*domain.User, error)
+	GetSubscribedToPromotion(ctx context.Context, limit, offset int) ([]*domain.User, error)
 }
 
 type UsersRepository struct {
@@ -43,7 +46,7 @@ func (r *UsersRepository) Create(ctx context.Context, contract *CreateContract) 
 
 	user := new(domain.User)
 
-	err = tx.QueryRow(ctx, createUserSQL, contract.Email, contract.FirstName, contract.LastName).Scan(
+	err = tx.QueryRow(ctx, createUserSQL, contract.Email).Scan(
 		&user.ID,
 		&user.Email,
 		&user.Role,
@@ -73,10 +76,12 @@ func (r *UsersRepository) Update(ctx context.Context, contract *UpdateContract) 
 		}
 	}()
 
-	row := tx.QueryRow(ctx, updateUserSQL, contract.FirstName, contract.LastName, contract.Phone, contract.Promotions, contract.ID)
+	now := time.Now().UTC()
+
+	row := tx.QueryRow(ctx, updateUserSQL, contract.FirstName, contract.LastName, contract.Phone, contract.Promotions, now, contract.ID)
 
 	user := new(domain.User)
-	if err := row.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Role, &user.Phone, &user.Promotions); err != nil {
+	if err := row.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Role, &user.Phone, &user.Promotions, &user.UpdatedAt); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, fmt.Errorf("user with id %s not found or deleted: %v", contract.ID, err)
 		}
@@ -96,9 +101,33 @@ func (r *UsersRepository) GetByEmail(ctx context.Context, contract *GetByEmailCo
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, fmt.Errorf("user with email %s not found: %v", contract.Email, err)
+			return nil, err
 		}
 		return nil, fmt.Errorf("failed to execute query: %v", err)
 	}
 	return user, nil
+}
+
+func (r *UsersRepository) GetSubscribedToPromotion(ctx context.Context, limit, offset int) ([]*domain.User, error) {
+	rows, err := r.pgx.Query(ctx, getSubscribedToPromotionUsersSQL, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %v", err)
+	}
+	defer rows.Close()
+
+	var users []*domain.User
+	for rows.Next() {
+		user := new(domain.User)
+		if err := rows.Scan(&user.Email, &user.FirstName, &user.LastName); err != nil {
+			log.Println(user)
+			return nil, fmt.Errorf("failed to scan row: %v", err)
+		}
+		users = append(users, user)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to scan rows: %v", err)
+	}
+
+	return users, nil
 }

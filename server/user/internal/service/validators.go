@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"github.com/google/uuid"
 	protobuf "github.com/omaqase/sato/user/pkg/api/v1/user"
 )
 
@@ -31,14 +30,21 @@ import (
 //}
 
 func ValidateGetSubscribedToPromotionUsersRequest(request *protobuf.GetSubscribedToPromotionUsersRequest) error {
+	// Проверяем, что request не nil
+	if request == nil {
+		return errors.New("request cannot be nil")
+	}
+
+	// Проверяем Limit
 	if request.Limit <= 0 || request.Limit > 1000 {
 		return errors.New("limit must be in range 1-1000")
 	}
-	if request.Cursor != "" {
-		if _, err := uuid.Parse(request.Cursor); err != nil {
-			return errors.New("invalid cursor format")
-		}
+
+	// Проверяем Offset
+	if request.Offset < 0 || request.Offset > 1000 {
+		return errors.New("offset must be in range 0-1000")
 	}
+
 	return nil
 }
 

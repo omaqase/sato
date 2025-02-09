@@ -25,7 +25,7 @@ const (
 	UserService_RefreshToken_FullMethodName                  = "/api.v1.user.UserService/RefreshToken"
 	UserService_Update_FullMethodName                        = "/api.v1.user.UserService/Update"
 	UserService_GetSubscribedToPromotionUsers_FullMethodName = "/api.v1.user.UserService/GetSubscribedToPromotionUsers"
-	UserService_GetUnverifiedEmailUsers_FullMethodName       = "/api.v1.user.UserService/GetUnverifiedEmailUsers"
+	UserService_ParseJWT_FullMethodName                      = "/api.v1.user.UserService/ParseJWT"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -38,7 +38,7 @@ type UserServiceClient interface {
 	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*RefreshTokenResponse, error)
 	Update(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	GetSubscribedToPromotionUsers(ctx context.Context, in *GetSubscribedToPromotionUsersRequest, opts ...grpc.CallOption) (*GetSubscribedToPromotionUsersResponse, error)
-	GetUnverifiedEmailUsers(ctx context.Context, in *GetUnverifiedEmailUsersRequest, opts ...grpc.CallOption) (*GetUnverifiedEmailUsersResponse, error)
+	ParseJWT(ctx context.Context, in *ParseJWTRequest, opts ...grpc.CallOption) (*ParseJWTResponse, error)
 }
 
 type userServiceClient struct {
@@ -109,10 +109,10 @@ func (c *userServiceClient) GetSubscribedToPromotionUsers(ctx context.Context, i
 	return out, nil
 }
 
-func (c *userServiceClient) GetUnverifiedEmailUsers(ctx context.Context, in *GetUnverifiedEmailUsersRequest, opts ...grpc.CallOption) (*GetUnverifiedEmailUsersResponse, error) {
+func (c *userServiceClient) ParseJWT(ctx context.Context, in *ParseJWTRequest, opts ...grpc.CallOption) (*ParseJWTResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetUnverifiedEmailUsersResponse)
-	err := c.cc.Invoke(ctx, UserService_GetUnverifiedEmailUsers_FullMethodName, in, out, cOpts...)
+	out := new(ParseJWTResponse)
+	err := c.cc.Invoke(ctx, UserService_ParseJWT_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ type UserServiceServer interface {
 	RefreshToken(context.Context, *RefreshTokenRequest) (*RefreshTokenResponse, error)
 	Update(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	GetSubscribedToPromotionUsers(context.Context, *GetSubscribedToPromotionUsersRequest) (*GetSubscribedToPromotionUsersResponse, error)
-	GetUnverifiedEmailUsers(context.Context, *GetUnverifiedEmailUsersRequest) (*GetUnverifiedEmailUsersResponse, error)
+	ParseJWT(context.Context, *ParseJWTRequest) (*ParseJWTResponse, error)
 }
 
 // UnimplementedUserServiceServer should be embedded to have
@@ -157,8 +157,8 @@ func (UnimplementedUserServiceServer) Update(context.Context, *UpdateUserRequest
 func (UnimplementedUserServiceServer) GetSubscribedToPromotionUsers(context.Context, *GetSubscribedToPromotionUsersRequest) (*GetSubscribedToPromotionUsersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSubscribedToPromotionUsers not implemented")
 }
-func (UnimplementedUserServiceServer) GetUnverifiedEmailUsers(context.Context, *GetUnverifiedEmailUsersRequest) (*GetUnverifiedEmailUsersResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUnverifiedEmailUsers not implemented")
+func (UnimplementedUserServiceServer) ParseJWT(context.Context, *ParseJWTRequest) (*ParseJWTResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ParseJWT not implemented")
 }
 func (UnimplementedUserServiceServer) testEmbeddedByValue() {}
 
@@ -288,20 +288,20 @@ func _UserService_GetSubscribedToPromotionUsers_Handler(srv interface{}, ctx con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_GetUnverifiedEmailUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetUnverifiedEmailUsersRequest)
+func _UserService_ParseJWT_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ParseJWTRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).GetUnverifiedEmailUsers(ctx, in)
+		return srv.(UserServiceServer).ParseJWT(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_GetUnverifiedEmailUsers_FullMethodName,
+		FullMethod: UserService_ParseJWT_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetUnverifiedEmailUsers(ctx, req.(*GetUnverifiedEmailUsersRequest))
+		return srv.(UserServiceServer).ParseJWT(ctx, req.(*ParseJWTRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -338,8 +338,8 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_GetSubscribedToPromotionUsers_Handler,
 		},
 		{
-			MethodName: "GetUnverifiedEmailUsers",
-			Handler:    _UserService_GetUnverifiedEmailUsers_Handler,
+			MethodName: "ParseJWT",
+			Handler:    _UserService_ParseJWT_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

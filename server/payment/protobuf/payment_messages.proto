@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option go_package = "github.com/omaqase/sato/payment/pkg/api/v1/payment;protobuf";
+
+package api.v1.payment;
+
+message AddPaymentMethodRequest {
+    string user_id = 1;
+    string card_number = 2;
+    string cardholder_name = 3;
+    int32 expiration_month = 4;
+    int32 expiration_year = 5;
+    string cvv = 6;
+}
+
+message AddPaymentMethodResponse {
+    string payment_method_id = 1;
+}
+
+message ProcessPaymentRequest {
+    string user_id = 1;
+    string payment_method_id = 2;
+    double amount = 3;
+    string currency = 4;
+}
+
+message ProcessPaymentResponse {
+    string transaction_id = 1;
+    string status = 2;
+}

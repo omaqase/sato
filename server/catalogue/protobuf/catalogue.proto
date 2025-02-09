@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+option go_package = "github.com/omaqase/sato/catalogue/pkg/api/v1/catalogue;protobuf";
+
+package api.v1.catalogue;
+
+import "google/api/annotations.proto";
+
+import "catalogue_messages.proto";
+
+service CategoryService {
+  rpc CreateCategory (CreateCategoryRequest) returns (CreateCategoryResponse) {
+    option (google.api.http) = {
+      post: "/admin/api/v1/category",
+      body: "*"
+    };
+  }
+
+  rpc UpdateCategory (UpdateCategoryRequest) returns (UpdateCategoryResponse) {
+    option (google.api.http) = {
+      patch: "/admin/api/v1/category/{category_id}",
+      body: "*"
+    };
+  }
+
+  rpc GetCategoryByID (GetCategoryByIDRequest) returns (GetCategoryByIDResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/category/{category_id}"
+    };
+  }
+
+  rpc GetCategoryBySlug (GetCategoryBySlugRequest) returns (GetCategoryBySlugResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/category/{slug}"
+    };
+  }
+
+  rpc ListCategory (ListCategoryRequest) returns (ListCategoryResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/category"
+    };
+  }
+
+  rpc DeleteCategoryByID (DeleteCategoryByIDRequest) returns (DeleteCategoryByIDResponse) {
+    option (google.api.http) = {
+      delete: "/admin/api/v1/category/{category_id}"
+    };
+  }
+
+  rpc DeleteCategoryBySlug (DeleteCategoryBySlugRequest) returns (DeleteCategoryBySlugResponse) {
+    option (google.api.http) = {
+      delete: "/admin/api/v1/category/{slug}"
+    };
+  }
+}
+
+service ProductService {
+  rpc CreateProduct (CreateProductRequest) returns (CreateProductResponse) {
+    option (google.api.http) = {
+      post: "/seller/api/v1/product",
+      body: "*"
+    };
+  }
+
+  rpc UpdateProduct (UpdateProductRequest) returns (UpdateProductResponse) {
+    option (google.api.http) = {
+      patch: "/seller/api/v1/product/{product_id}",
+      body: "*"
+    };
+  }
+
+  rpc GetProductByID (GetProductByIDRequest) returns (GetProductByIDResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/product/{product_id}"
+    };
+  }
+
+  rpc ListProduct (ListProductRequest) returns (ListProductResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/product"
+    };
+  }
+
+  rpc DeleteProduct (DeleteProductRequest) returns (DeleteProductResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/product/{product_id}"
+    };
+  }
+}

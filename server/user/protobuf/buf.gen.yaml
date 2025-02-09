@@ -21,6 +21,16 @@ plugins:
     out: ../../notification/pkg/api/v1/user
     opt:
       - paths=source_relative
+  # Catalogue
+  - remote: buf.build/grpc/go:v1.5.1
+    out: ../../catalogue/pkg/api/v1/user
+    opt:
+      - paths=source_relative
+      - require_unimplemented_servers=false
+  - remote: buf.build/protocolbuffers/go:v1.36.1
+    out: ../../catalogue/pkg/api/v1/user
+    opt:
+      - paths=source_relative
   # Gateway
   - remote: buf.build/grpc/go:v1.5.1
     out: ../../gateway/pkg/api/v1/user

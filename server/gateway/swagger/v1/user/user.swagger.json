@@ -42,47 +42,11 @@
             "format": "int32"
           },
           {
-            "name": "cursor",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "UserService"
-        ]
-      }
-    },
-    "/admin/api/v1/user/unverified_emails": {
-      "get": {
-        "operationId": "UserService_GetUnverifiedEmailUsers",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/userGetUnverifiedEmailUsersResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "limit",
+            "name": "offset",
             "in": "query",
             "required": false,
             "type": "integer",
             "format": "int32"
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "required": false,
-            "type": "string"
           }
         ],
         "tags": [
@@ -293,25 +257,11 @@
       "properties": {
         "email": {
           "type": "string"
-        }
-      }
-    },
-    "userGetUnverifiedEmailUsersResponse": {
-      "type": "object",
-      "properties": {
-        "emails": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/userGetUnverifiedEmailUsersResponseItem"
-          }
-        }
-      }
-    },
-    "userGetUnverifiedEmailUsersResponseItem": {
-      "type": "object",
-      "properties": {
-        "email": {
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
           "type": "string"
         }
       }
@@ -322,6 +272,14 @@
         "status": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "userParseJWTResponse": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
         }
       }
     },
@@ -347,7 +305,7 @@
     "userSendOTPResponse": {
       "type": "object",
       "properties": {
-        "otp_token": {
+        "token": {
           "type": "string"
         }
       }
@@ -392,7 +350,7 @@
     "userVerifyOTPRequest": {
       "type": "object",
       "properties": {
-        "otp_token": {
+        "token": {
           "type": "string"
         },
         "email": {

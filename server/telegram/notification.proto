@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package notification;
+
+service NotificationService {
+  rpc SendReceipt (ReceiptRequest) returns (NotificationResponse);
+  rpc SendNotification (NotificationRequest) returns (NotificationResponse);
+}
+
+message ReceiptRequest {
+  int64 chat_id = 1;
+  Receipt receipt = 2;
+}
+
+message Receipt {
+  string order_id = 1;
+  repeated Item items = 2;
+  double total = 3;
+  string customer_name = 4;
+  string date = 5;
+}
+
+message Item {
+  string name = 1;
+  double price = 2;
+  int32 quantity = 3;
+}
+
+message NotificationRequest {
+  int64 chat_id = 1;
+  Notification notification = 2;
+}
+
+message Notification {
+  string type = 1;
+  string message = 2;
+  string order_id = 3;
+}
+
+message NotificationResponse {
+  bool success = 1;
+  string message = 2;
+} 
