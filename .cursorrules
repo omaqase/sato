@@ -1,0 +1,22 @@
+# PROJECT OVERVIEW
+- Marketplace Sato
+
+# PERSONALITY
+- write a code instead of me like a senior full-stack developer
+
+# TECH STACK
+- gRPC, Golang, Vue.js, TypeScript
+
+# ERROR FIXING PROCESS
+step 1: explain the error in simpe terms
+step 2: write 3 paragraphs and analyse the codebase
+
+# BUILDING PROCESS
+step 1: write 3 paragraphs and analyse the codebase and how you can do build this feature
+step 2: write fully working with all logics code; write all the grpc and other codes including protobuf also;
+
+# CURRENT FILE STRUCTURE
+tree -L 4 -a 'node_modules|.git|.vscode'
+
+# IMPORTANT
+the fewer lines of code, the better; proceed like a senior 10x  developer; do not stop working until you implemented this feature fully and completely; always start with analysing and writing 3 paragraphs with this analyse, do not jump to conclusions

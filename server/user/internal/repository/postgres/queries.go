@@ -25,3 +25,37 @@ const getSubscribedToPromotionUsersSQL = `
     WHERE promotions = true AND deleted_at IS NULL
     LIMIT $1 OFFSET $2
 `
+
+const getUserByIDSQL = `
+	SELECT id FROM user_management.users WHERE id = $1 AND deleted_at IS NULL
+`
+
+const createSellerSQL = `
+	INSERT INTO user_management.sellers(user_id, rating)
+	VALUES ($1, $2)
+`
+
+const addToFavoritesSQL = `
+    INSERT INTO user_management.favorites (user_id, product_id)
+    VALUES ($1, $2)
+    RETURNING id, user_id, product_id, created_at
+`
+
+const removeFromFavoritesSQL = `
+    DELETE FROM user_management.favorites
+    WHERE user_id = $1 AND product_id = $2
+`
+
+const getFavoritesSQL = `
+    SELECT id, user_id, product_id, created_at
+    FROM user_management.favorites
+    WHERE user_id = $1
+    ORDER BY created_at DESC
+    LIMIT $2 OFFSET $3
+`
+
+const getFavoritesCountSQL = `
+    SELECT COUNT(*)
+    FROM user_management.favorites
+    WHERE user_id = $1
+`

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option go_package = "github.com/omaqase/sato/server/order/pkg/api/v1/order;order";
+
+package api.v1.payment;
+
+message CreateOrderRequest {
+
+}
+
+message CreateOrderResponse {
+  
+}

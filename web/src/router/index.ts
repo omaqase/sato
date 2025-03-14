@@ -2,6 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import { dashboardRoutes } from './dashboard'
 import { authMiddleware } from './middleware'
+import { adminRoutes } from './admin.routes'
+import { useAuthStore } from '@/stores/useAuthStore'
+import { useRoleStore } from '@/stores/useRoleStore'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,11 +13,6 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
-    },
-    {
-      path: '/account/favorites',
-      name: 'account-favorites',
-      component: () => import('../modules/public/views/FavoritesView.vue'),
     },
     {
       path: '/account/cart',
@@ -27,6 +25,15 @@ const router = createRouter({
       component: () => import('../modules/public/views/profile/ProfileView.vue'),
       meta: {
         requiresAuth: true,
+      },
+    },
+    {
+      path: '/favorites',
+      name: 'favorites',
+      component: () => import('../modules/public/views/FavoritesView.vue'),
+      meta: {
+        requiresAuth: true,
+        title: 'My Favorites'
       },
     },
     {
@@ -133,6 +140,7 @@ const router = createRouter({
       component: () => import('@/modules/public/views/ProductView.vue'),
     },
     ...dashboardRoutes,
+    ...adminRoutes,
   ],
 })
 

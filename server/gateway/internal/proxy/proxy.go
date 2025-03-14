@@ -3,10 +3,11 @@ package proxy
 import (
 	"context"
 	"fmt"
-	protobuf "github.com/omaqase/sato/gateway/pkg/api/v1/catalogue"
 	"log"
 	"net/http"
 	"slices"
+
+	protobuf "github.com/omaqase/sato/gateway/pkg/api/v1/catalogue"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/omaqase/sato/gateway/config"
@@ -122,21 +123,25 @@ func AuthenticationMiddleware(next http.Handler) http.Handler {
 
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
+			log.Println(3)
 			http.Error(w, "You are unauthorized", http.StatusUnauthorized)
 			return
 		}
 
 		claims, err := utils.ParseJWT("qxwneiqwheuiys", authHeader)
 		if err != nil {
+			log.Println(claims)
+			log.Println(2)
 			http.Error(w, "You are unauthorized", http.StatusUnauthorized)
 			return
 		}
 
 		roles := GetRequiredRoles(r.URL.Path)
 
-		if !slices.Contains(roles, claims.Role) {
+		if len(roles) == 0 || !slices.Contains(roles, claims.Role) {
 			log.Println(roles)
 			log.Println(claims.Role)
+			log.Println(3)
 			http.Error(w, "You are unauthorized", http.StatusUnauthorized)
 			return
 		}
@@ -148,8 +153,8 @@ func AuthenticationMiddleware(next http.Handler) http.Handler {
 func EnableCORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Grpc-Metadata-X-Request-ID")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Grpc-Metadata-X-Request-ID, X-CSRF-Token, Accept")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 		if r.Method == http.MethodOptions {

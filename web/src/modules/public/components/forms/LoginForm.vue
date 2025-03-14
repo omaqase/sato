@@ -53,6 +53,7 @@ import { z } from 'zod'
 import { authApi } from '@/api/auth'
 import OTPInput from './OTPInput.vue'
 import { useAuthStore } from '@/stores/useAuthStore'
+import { useRoleStore } from '@/stores/useRoleStore'
 
 // Определение шагов формы
 enum Step {
@@ -135,9 +136,10 @@ async function verifyCode() {
 
     // Сохраняем данные пользователя
     const authStore = useAuthStore()
-    authStore.setUser({
-      email: formData.email,
-    })
+    const roleStore = useRoleStore()
+    
+    authStore.setUser(response.user)
+    await roleStore.checkAdminRole()
 
     // Редиректим на нужную страницу
     if (response.is_new_user) {
@@ -146,7 +148,10 @@ async function verifyCode() {
       router.push('/account/overview')
     }
   } catch (error: any) {
-    errorMessage.value = error.response?.data?.message || 'Неверный код'
+    console.error('Verification error:', error)
+    errorMessage.value = error.response?.data?.message || 
+      error.message || 
+      'Ошибка при проверке кода'
   } finally {
     isLoading.value = false
   }

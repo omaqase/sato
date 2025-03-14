@@ -2,31 +2,25 @@ package service
 
 import (
 	"errors"
-	"fmt"
-	"github.com/google/uuid"
 	"regexp"
-	"unicode"
+
+	"github.com/google/uuid"
 )
 
 func ValidateUUID(id string) error {
 	if _, err := uuid.Parse(id); err != nil {
-		return errors.New("invalid id")
+		return errors.New("invalid UUID format")
 	}
-
 	return nil
 }
 
 func ValidateSlug(slug string) error {
-	for _, char := range slug {
-		if unicode.IsDigit(char) {
-			return fmt.Errorf("slug shouldn't contain digits")
-		}
+	match, err := regexp.MatchString("^[a-z0-9]+(?:-[a-z0-9]+)*$", slug)
+	if err != nil {
+		return err
 	}
-
-	specialCharRegex := regexp.MustCompile(`[^a-zA-Zа-яА-Я ]`)
-	if specialCharRegex.MatchString(slug) {
-		return fmt.Errorf("slug shouldn't contain any special symbols")
+	if !match {
+		return errors.New("invalid slug format")
 	}
-
 	return nil
 }

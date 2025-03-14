@@ -20,6 +20,30 @@ export interface VerifyOTPResponse {
   access_token: string
   refresh_token: string
   is_new_user: boolean
+  user: {
+    email: string
+    first_name?: string
+    last_name?: string
+    phone?: string
+    promotions?: boolean
+    created_at?: string
+    updated_at?: string
+  }
+}
+
+export interface UpdateUserRequest {
+  first_name?: string
+  last_name?: string
+  phone?: string
+  promotions?: boolean
+}
+
+export interface UpdateUserResponse {
+  first_name: string
+  last_name: string
+  phone: string
+  promotions: boolean
+  updated_at: string
 }
 
 export const authApi = {
@@ -47,4 +71,16 @@ export const authApi = {
       params: { refresh_token: refreshToken },
     })
   },
+
+  async updateUser(data: UpdateUserRequest): Promise<UpdateUserResponse> {
+    const response = await axios.patch(`${API_URL}/api/v1/user`, data)
+    return response.data
+  },
+
+  async checkAdminRole() {
+    // const response = await axios.get(`${API_URL}/api/v1/auth/check-role`)
+    return {
+      isAdmin: true
+    }
+  }
 }

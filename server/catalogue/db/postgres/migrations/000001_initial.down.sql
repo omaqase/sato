@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS product_management.products_questions_replies;
+DROP TABLE IF EXISTS product_management.products_questions;
+DROP TABLE IF EXISTS product_management.products_reviews_replies;
+DROP TABLE IF EXISTS product_management.products_reviews;
+DROP TABLE IF EXISTS product_management.products;
+DROP TABLE IF EXISTS product_management.categories_hierarchy;
+DROP TABLE IF EXISTS product_management.categories;
+DROP TYPE IF EXISTS product_management.product_approve_status;
+DROP SCHEMA IF EXISTS product_management;

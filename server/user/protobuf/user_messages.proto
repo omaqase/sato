@@ -4,6 +4,17 @@ package api.v1.user;
 
 import "google/protobuf/timestamp.proto";
 
+message UserDTO {
+  string email = 1 [json_name = "email"];
+  string first_name = 2 [json_name = "first_name"];
+  string last_name = 3 [json_name = "last_name"];
+  optional string phone = 4 [json_name = "phone"];
+  optional bool promotions = 5 [json_name = "promotions"];
+  string created_at = 6 [json_name = "created_at"];
+  string updated_at = 7 [json_name = "updated_at"];
+  string deleted_at = 8 [json_name = "deleted_at"];
+}
+
 message SendOTPRequest {
   string email = 1 [json_name = "email"];
 }
@@ -22,6 +33,7 @@ message VerifyOTPResponse {
   string access_token = 1 [json_name = "access_token"];
   string refresh_token = 2 [json_name = "refresh_token"];
   bool is_new_user = 3 [json_name = "is_new_user"];
+  UserDTO user = 4 [json_name = "user"];
 }
 
 message UpdateUserRequest {
@@ -78,3 +90,89 @@ message ParseJWTRequest {
 message ParseJWTResponse {
   string user_id = 1;
 }
+
+message MakeSellerRequest {
+  string user_id = 1;
+}
+
+message MakeSellerResponse {
+  int32 status = 1;
+}
+
+message AddToFavoritesRequest {
+  string product_id = 1;
+}
+
+message AddToFavoritesResponse {
+  string id = 1;
+  string product_id = 2;
+  string created_at = 3;
+}
+
+message RemoveFromFavoritesRequest {
+  string product_id = 1;
+}
+
+message RemoveFromFavoritesResponse {}
+
+message GetFavoritesRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+message FavoriteItem {
+  string id = 1;
+  string product_id = 2;
+  string created_at = 3;
+}
+
+message GetFavoritesResponse {
+  repeated FavoriteItem items = 1;
+  int32 total = 2;
+}
+
+message CartItem {
+  string id = 1 [json_name = "id"];
+  string product_id = 2 [json_name = "product_id"];
+  int32 quantity = 3 [json_name = "quantity"];
+  string created_at = 4 [json_name = "created_at"];
+  string updated_at = 5 [json_name = "updated_at"];
+}
+
+message GetCartRequest {
+  int32 limit = 1 [json_name = "limit"];
+  int32 offset = 2 [json_name = "offset"];
+}
+
+message GetCartResponse {
+  repeated CartItem items = 1 [json_name = "items"];
+  int32 total = 2 [json_name = "total"];
+}
+
+message AddToCartRequest {
+  string product_id = 1 [json_name = "product_id"];
+  int32 quantity = 2 [json_name = "quantity"];
+}
+
+message AddToCartResponse {
+  CartItem item = 1 [json_name = "item"];
+}
+
+message UpdateCartItemRequest {
+  string product_id = 1 [json_name = "product_id"];
+  int32 quantity = 2 [json_name = "quantity"];
+}
+
+message UpdateCartItemResponse {
+  CartItem item = 1 [json_name = "item"];
+}
+
+message RemoveFromCartRequest {
+  string product_id = 1 [json_name = "product_id"];
+}
+
+message RemoveFromCartResponse {}
+
+message ClearCartRequest {}
+
+message ClearCartResponse {}

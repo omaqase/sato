@@ -52,6 +52,25 @@ service CategoryService {
       delete: "/admin/api/v1/category/{slug}"
     };
   }
+
+  rpc GetCategoryAncestors(GetCategoryAncestorsRequest) returns (GetCategoryAncestorsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/category/{category_id}/ancestors"
+    };
+  }
+
+  rpc GetCategoryDescendants(GetCategoryDescendantsRequest) returns (GetCategoryDescendantsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/category/{category_id}/descendants"
+    };
+  }
+
+  rpc AddCategoryHierarchy(AddCategoryHierarchyRequest) returns (AddCategoryHierarchyResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/category/hierarchy"
+      body: "*"
+    };
+  }
 }
 
 service ProductService {
@@ -86,4 +105,8 @@ service ProductService {
       delete: "/api/v1/product/{product_id}"
     };
   }
+
+  rpc AddToFavorites(AddToFavoritesRequest) returns (AddToFavoritesResponse) {}
+    rpc RemoveFromFavorites(RemoveFromFavoritesRequest) returns (RemoveFromFavoritesResponse) {}
+    rpc GetUserFavorites(GetUserFavoritesRequest) returns (GetUserFavoritesResponse) {}
 }

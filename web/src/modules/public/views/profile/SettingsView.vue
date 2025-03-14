@@ -1,6 +1,6 @@
 <template>
   <div class="flex-1">
-    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100">
       <div class="p-6 border-b border-gray-100">
         <h2 class="text-lg font-semibold text-gray-900">Настройки профиля</h2>
       </div>
@@ -18,7 +18,7 @@
                 :type="field.type"
                 :id="field.id"
                 :value="field.value"
-                class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-600 transition-colors"
+                class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-600 transition-all duration-300 hover:border-blue-300 bg-white/50 backdrop-blur-sm"
                 :placeholder="field.placeholder"
               />
             </div>
@@ -40,7 +40,7 @@
               </div>
               <button
                 @click="setting.enabled = !setting.enabled"
-                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+                class="relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 shadow-sm hover:shadow-md"
                 :class="setting.enabled ? 'bg-blue-600' : 'bg-gray-200'"
               >
                 <span
@@ -55,7 +55,7 @@
         <!-- Save Button -->
         <div class="pt-8 border-t">
           <button
-            class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors"
+            class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium rounded-xl transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg"
           >
             Сохранить изменения
           </button>

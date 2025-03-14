@@ -66,7 +66,7 @@ import WhatsappIcon from './icons/WhatsappIcon.vue'
           <ul class="space-y-2 text-sm text-gray-400">
             <li>
               <router-link to="/sell" class="hover:text-white transition-colors"
-                >Продавайте на MarketPlace</router-link
+                >Продавайте на Sato</router-link
               >
             </li>
             <li>
@@ -85,8 +85,8 @@ import WhatsappIcon from './icons/WhatsappIcon.vue'
         <div>
           <h3 class="font-medium mb-4">Контакты</h3>
           <ul class="space-y-2 text-sm text-gray-400">
-            <li>8 800 555 35 35</li>
-            <li>support@marketplace.ru</li>
+            <li>+7 777 777 77 77</li>
+            <li>support@sato.kz</li>
           </ul>
           <div class="flex items-center gap-4 mt-4">
             <a href="#" class="p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors">
@@ -101,7 +101,7 @@ import WhatsappIcon from './icons/WhatsappIcon.vue'
 
       <div class="pt-8 border-t border-gray-800 text-sm text-gray-400">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div>© 2024 MarketPlace. Все права защищены</div>
+          <div>© 2024 Sato. Все права защищены</div>
           <div class="flex items-center gap-4">
             <router-link to="/privacy-policy" class="hover:text-white transition-colors"
               >Политика конфиденциальности</router-link

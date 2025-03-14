@@ -32,3 +32,9 @@ const ListProductsSQL = `
     ORDER BY created_at DESC
     LIMIT $1 OFFSET $2
 `
+
+const GetProductBySlugSQL = `
+    SELECT id, title, slug, category_id, seller_id, stock, rating, approved, created_at, updated_at
+    FROM product_management.products
+    WHERE slug = $1 AND deleted_at IS NULL
+`

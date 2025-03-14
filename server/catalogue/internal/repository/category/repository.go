@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/omaqase/sato/catalogue/internal/domain/category"
-	"time"
 )
 
 type IRepository interface {
@@ -18,6 +19,9 @@ type IRepository interface {
 	List(ctx context.Context, limit, offset int) ([]*category.Entity, error)
 	DeleteByID(ctx context.Context, id string) error
 	DeleteBySlug(ctx context.Context, slug string) error
+	AddHierarchy(ctx context.Context, ancestorID, descendantID string, depth int) error
+	GetAncestors(ctx context.Context, categoryID string) ([]*category.Entity, error)
+	GetDescendants(ctx context.Context, categoryID string) ([]*category.Entity, error)
 }
 
 type Repository struct {
@@ -147,4 +151,60 @@ func (r Repository) DeleteBySlug(ctx context.Context, slug string) error {
 		return fmt.Errorf("failed to delete category by slug: %w", err)
 	}
 	return nil
+}
+
+func (r Repository) AddHierarchy(ctx context.Context, ancestorID, descendantID string, depth int) error {
+	_, err := r.pool.Exec(ctx, AddCategoryHierarchySQL, ancestorID, descendantID, depth)
+	if err != nil {
+		return fmt.Errorf("failed to add category hierarchy: %w", err)
+	}
+	return nil
+}
+
+func (r Repository) GetAncestors(ctx context.Context, categoryID string) ([]*category.Entity, error) {
+	rows, err := r.pool.Query(ctx, GetCategoryAncestorsSQL, categoryID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get category ancestors: %w", err)
+	}
+	defer rows.Close()
+
+	var categories []*category.Entity
+	for rows.Next() {
+		dest := new(category.Entity)
+		err := rows.Scan(&dest.ID, &dest.Title, &dest.Slug, &dest.CreatedAt, &dest.UpdatedAt)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan category ancestor: %w", err)
+		}
+		categories = append(categories, dest)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("row iteration error: %w", err)
+	}
+
+	return categories, nil
+}
+
+func (r Repository) GetDescendants(ctx context.Context, categoryID string) ([]*category.Entity, error) {
+	rows, err := r.pool.Query(ctx, GetCategoryDescendantsSQL, categoryID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get category descendants: %w", err)
+	}
+	defer rows.Close()
+
+	var categories []*category.Entity
+	for rows.Next() {
+		dest := new(category.Entity)
+		err := rows.Scan(&dest.ID, &dest.Title, &dest.Slug, &dest.CreatedAt, &dest.UpdatedAt)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan category descendant: %w", err)
+		}
+		categories = append(categories, dest)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("row iteration error: %w", err)
+	}
+
+	return categories, nil
 }

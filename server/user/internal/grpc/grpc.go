@@ -3,57 +3,38 @@ package grpc
 import (
 	"context"
 	"fmt"
+	"log"
+	"net"
+
 	"github.com/omaqase/sato/user/internal/config"
 	protobuf "github.com/omaqase/sato/user/pkg/api/v1/user"
-	"go.uber.org/fx"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/grpclog"
-	"google.golang.org/grpc/reflection"
-	"net"
 )
 
 type Server struct {
-	Listener net.Listener
-	Server   *grpc.Server
+	grpcServer  *grpc.Server
+	userService protobuf.UserServiceServer
 }
 
-func StartGRPCServer(server *grpc.Server, listener net.Listener) error {
-	go func() {
-		if err := server.Serve(listener); err != nil {
-			grpclog.Fatalf("failed to serve: %v", err)
-		}
-	}()
-	grpclog.Infof("gRPC server serving on %s", listener.Addr())
-	return nil
-}
-
-func StopGRPCServer(server *grpc.Server) error {
-	server.GracefulStop()
-	return nil
-}
-
-func NewGRPCServer(lc fx.Lifecycle, service protobuf.UserServiceServer, config config.Config) (*Server, error) {
-	addr := fmt.Sprintf(":%s", config.App.Port)
-	listener, err := net.Listen("tcp", addr)
-	if err != nil {
-		return nil, fmt.Errorf("failed to listen on TCP address %s: %w", addr, err)
-	}
-
-	server := grpc.NewServer()
-	reflection.Register(server)
-	protobuf.RegisterUserServiceServer(server, service)
-
-	lc.Append(fx.Hook{
-		OnStart: func(context.Context) error {
-			return StartGRPCServer(server, listener)
-		},
-		OnStop: func(context.Context) error {
-			return StopGRPCServer(server)
-		},
-	})
+func NewGRPCServer(userService protobuf.UserServiceServer) *Server {
+	grpcServer := grpc.NewServer()
+	protobuf.RegisterUserServiceServer(grpcServer, userService)
 
 	return &Server{
-		Listener: listener,
-		Server:   server,
-	}, nil
+		grpcServer:  grpcServer,
+		userService: userService,
+	}
+}
+
+func NewListener(config config.Config) (net.Listener, error) {
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", config.App.Port))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create listener: %w", err)
+	}
+	return listener, nil
+}
+
+func StartGRPCServer(lc context.Context, server *Server, listener net.Listener) error {
+	log.Printf("Starting gRPC server on %s", listener.Addr().String())
+	return server.grpcServer.Serve(listener)
 }

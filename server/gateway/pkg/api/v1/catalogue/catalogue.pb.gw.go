@@ -277,6 +277,102 @@ func local_request_CategoryService_DeleteCategoryBySlug_0(ctx context.Context, m
 	return msg, metadata, err
 }
 
+func request_CategoryService_GetCategoryAncestors_0(ctx context.Context, marshaler runtime.Marshaler, client CategoryServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetCategoryAncestorsRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["category_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "category_id")
+	}
+	protoReq.CategoryId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "category_id", err)
+	}
+	msg, err := client.GetCategoryAncestors(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_CategoryService_GetCategoryAncestors_0(ctx context.Context, marshaler runtime.Marshaler, server CategoryServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetCategoryAncestorsRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["category_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "category_id")
+	}
+	protoReq.CategoryId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "category_id", err)
+	}
+	msg, err := server.GetCategoryAncestors(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_CategoryService_GetCategoryDescendants_0(ctx context.Context, marshaler runtime.Marshaler, client CategoryServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetCategoryDescendantsRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["category_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "category_id")
+	}
+	protoReq.CategoryId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "category_id", err)
+	}
+	msg, err := client.GetCategoryDescendants(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_CategoryService_GetCategoryDescendants_0(ctx context.Context, marshaler runtime.Marshaler, server CategoryServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetCategoryDescendantsRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["category_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "category_id")
+	}
+	protoReq.CategoryId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "category_id", err)
+	}
+	msg, err := server.GetCategoryDescendants(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_CategoryService_AddCategoryHierarchy_0(ctx context.Context, marshaler runtime.Marshaler, client CategoryServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq AddCategoryHierarchyRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := client.AddCategoryHierarchy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_CategoryService_AddCategoryHierarchy_0(ctx context.Context, marshaler runtime.Marshaler, server CategoryServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq AddCategoryHierarchyRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.AddCategoryHierarchy(ctx, &protoReq)
+	return msg, metadata, err
+}
+
 func request_ProductService_CreateProduct_0(ctx context.Context, marshaler runtime.Marshaler, client ProductServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq CreateProductRequest
@@ -593,6 +689,66 @@ func RegisterCategoryServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		}
 		forward_CategoryService_DeleteCategoryBySlug_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodGet, pattern_CategoryService_GetCategoryAncestors_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1.catalogue.CategoryService/GetCategoryAncestors", runtime.WithHTTPPathPattern("/api/v1/category/{category_id}/ancestors"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_CategoryService_GetCategoryAncestors_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CategoryService_GetCategoryAncestors_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_CategoryService_GetCategoryDescendants_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1.catalogue.CategoryService/GetCategoryDescendants", runtime.WithHTTPPathPattern("/api/v1/category/{category_id}/descendants"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_CategoryService_GetCategoryDescendants_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CategoryService_GetCategoryDescendants_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_CategoryService_AddCategoryHierarchy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1.catalogue.CategoryService/AddCategoryHierarchy", runtime.WithHTTPPathPattern("/api/v1/category/hierarchy"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_CategoryService_AddCategoryHierarchy_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CategoryService_AddCategoryHierarchy_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 
 	return nil
 }
@@ -862,27 +1018,84 @@ func RegisterCategoryServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		}
 		forward_CategoryService_DeleteCategoryBySlug_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodGet, pattern_CategoryService_GetCategoryAncestors_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/api.v1.catalogue.CategoryService/GetCategoryAncestors", runtime.WithHTTPPathPattern("/api/v1/category/{category_id}/ancestors"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_CategoryService_GetCategoryAncestors_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CategoryService_GetCategoryAncestors_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_CategoryService_GetCategoryDescendants_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/api.v1.catalogue.CategoryService/GetCategoryDescendants", runtime.WithHTTPPathPattern("/api/v1/category/{category_id}/descendants"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_CategoryService_GetCategoryDescendants_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CategoryService_GetCategoryDescendants_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_CategoryService_AddCategoryHierarchy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/api.v1.catalogue.CategoryService/AddCategoryHierarchy", runtime.WithHTTPPathPattern("/api/v1/category/hierarchy"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_CategoryService_AddCategoryHierarchy_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CategoryService_AddCategoryHierarchy_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	return nil
 }
 
 var (
-	pattern_CategoryService_CreateCategory_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"admin", "api", "v1", "category"}, ""))
-	pattern_CategoryService_UpdateCategory_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"admin", "api", "v1", "category", "category_id"}, ""))
-	pattern_CategoryService_GetCategoryByID_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "category", "category_id"}, ""))
-	pattern_CategoryService_GetCategoryBySlug_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "category", "slug"}, ""))
-	pattern_CategoryService_ListCategory_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "category"}, ""))
-	pattern_CategoryService_DeleteCategoryByID_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"admin", "api", "v1", "category", "category_id"}, ""))
-	pattern_CategoryService_DeleteCategoryBySlug_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"admin", "api", "v1", "category", "slug"}, ""))
+	pattern_CategoryService_CreateCategory_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"admin", "api", "v1", "category"}, ""))
+	pattern_CategoryService_UpdateCategory_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"admin", "api", "v1", "category", "category_id"}, ""))
+	pattern_CategoryService_GetCategoryByID_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "category", "category_id"}, ""))
+	pattern_CategoryService_GetCategoryBySlug_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "category", "slug"}, ""))
+	pattern_CategoryService_ListCategory_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "category"}, ""))
+	pattern_CategoryService_DeleteCategoryByID_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"admin", "api", "v1", "category", "category_id"}, ""))
+	pattern_CategoryService_DeleteCategoryBySlug_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"admin", "api", "v1", "category", "slug"}, ""))
+	pattern_CategoryService_GetCategoryAncestors_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "category", "category_id", "ancestors"}, ""))
+	pattern_CategoryService_GetCategoryDescendants_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "category", "category_id", "descendants"}, ""))
+	pattern_CategoryService_AddCategoryHierarchy_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "category", "hierarchy"}, ""))
 )
 
 var (
-	forward_CategoryService_CreateCategory_0       = runtime.ForwardResponseMessage
-	forward_CategoryService_UpdateCategory_0       = runtime.ForwardResponseMessage
-	forward_CategoryService_GetCategoryByID_0      = runtime.ForwardResponseMessage
-	forward_CategoryService_GetCategoryBySlug_0    = runtime.ForwardResponseMessage
-	forward_CategoryService_ListCategory_0         = runtime.ForwardResponseMessage
-	forward_CategoryService_DeleteCategoryByID_0   = runtime.ForwardResponseMessage
-	forward_CategoryService_DeleteCategoryBySlug_0 = runtime.ForwardResponseMessage
+	forward_CategoryService_CreateCategory_0         = runtime.ForwardResponseMessage
+	forward_CategoryService_UpdateCategory_0         = runtime.ForwardResponseMessage
+	forward_CategoryService_GetCategoryByID_0        = runtime.ForwardResponseMessage
+	forward_CategoryService_GetCategoryBySlug_0      = runtime.ForwardResponseMessage
+	forward_CategoryService_ListCategory_0           = runtime.ForwardResponseMessage
+	forward_CategoryService_DeleteCategoryByID_0     = runtime.ForwardResponseMessage
+	forward_CategoryService_DeleteCategoryBySlug_0   = runtime.ForwardResponseMessage
+	forward_CategoryService_GetCategoryAncestors_0   = runtime.ForwardResponseMessage
+	forward_CategoryService_GetCategoryDescendants_0 = runtime.ForwardResponseMessage
+	forward_CategoryService_AddCategoryHierarchy_0   = runtime.ForwardResponseMessage
 )
 
 // RegisterProductServiceHandlerFromEndpoint is same as RegisterProductServiceHandler but

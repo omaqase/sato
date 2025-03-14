@@ -2,6 +2,8 @@ package category
 
 import (
 	"errors"
+	"log"
+
 	"github.com/omaqase/sato/catalogue/internal/service"
 	protobuf "github.com/omaqase/sato/catalogue/pkg/api/v1/catalogue"
 )
@@ -55,8 +57,15 @@ func ValidateListCategoryRequest(request *protobuf.ListCategoryRequest) error {
 		return errors.New("request is nil")
 	}
 
+	log.Println(request.Limit)
+	log.Println(request.Offset)
+
 	if request.Limit <= 0 || request.Limit > 100 {
-		return errors.New("limit must be between 0 and 100")
+		return errors.New("limit must be greater than 0 and less than or equal to 100")
+	}
+
+	if request.Offset < 0 {
+		return errors.New("offset must be greater than or equal to 0")
 	}
 
 	return nil

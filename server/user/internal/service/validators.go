@@ -2,6 +2,8 @@ package service
 
 import (
 	"errors"
+
+	"github.com/google/uuid"
 	protobuf "github.com/omaqase/sato/user/pkg/api/v1/user"
 )
 
@@ -51,6 +53,29 @@ func ValidateGetSubscribedToPromotionUsersRequest(request *protobuf.GetSubscribe
 func ValidateUpdateUserRequest(request *protobuf.UpdateUserRequest) error {
 	if request == nil {
 		return errors.New("request is required")
+	}
+
+	return nil
+}
+
+func ValidateUUID(id string) error {
+	if _, err := uuid.Parse(id); err != nil {
+		return errors.New("invalid UUID format")
+	}
+	return nil
+}
+
+func ValidateGetFavoritesRequest(request *protobuf.GetFavoritesRequest) error {
+	if request == nil {
+		return errors.New("request cannot be nil")
+	}
+
+	if request.Limit <= 0 || request.Limit > 100 {
+		return errors.New("limit must be between 1 and 100")
+	}
+
+	if request.Offset < 0 {
+		return errors.New("offset cannot be negative")
 	}
 
 	return nil

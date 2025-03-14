@@ -19,13 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CategoryService_CreateCategory_FullMethodName       = "/api.v1.catalogue.CategoryService/CreateCategory"
-	CategoryService_UpdateCategory_FullMethodName       = "/api.v1.catalogue.CategoryService/UpdateCategory"
-	CategoryService_GetCategoryByID_FullMethodName      = "/api.v1.catalogue.CategoryService/GetCategoryByID"
-	CategoryService_GetCategoryBySlug_FullMethodName    = "/api.v1.catalogue.CategoryService/GetCategoryBySlug"
-	CategoryService_ListCategory_FullMethodName         = "/api.v1.catalogue.CategoryService/ListCategory"
-	CategoryService_DeleteCategoryByID_FullMethodName   = "/api.v1.catalogue.CategoryService/DeleteCategoryByID"
-	CategoryService_DeleteCategoryBySlug_FullMethodName = "/api.v1.catalogue.CategoryService/DeleteCategoryBySlug"
+	CategoryService_CreateCategory_FullMethodName         = "/api.v1.catalogue.CategoryService/CreateCategory"
+	CategoryService_UpdateCategory_FullMethodName         = "/api.v1.catalogue.CategoryService/UpdateCategory"
+	CategoryService_GetCategoryByID_FullMethodName        = "/api.v1.catalogue.CategoryService/GetCategoryByID"
+	CategoryService_GetCategoryBySlug_FullMethodName      = "/api.v1.catalogue.CategoryService/GetCategoryBySlug"
+	CategoryService_ListCategory_FullMethodName           = "/api.v1.catalogue.CategoryService/ListCategory"
+	CategoryService_DeleteCategoryByID_FullMethodName     = "/api.v1.catalogue.CategoryService/DeleteCategoryByID"
+	CategoryService_DeleteCategoryBySlug_FullMethodName   = "/api.v1.catalogue.CategoryService/DeleteCategoryBySlug"
+	CategoryService_GetCategoryAncestors_FullMethodName   = "/api.v1.catalogue.CategoryService/GetCategoryAncestors"
+	CategoryService_GetCategoryDescendants_FullMethodName = "/api.v1.catalogue.CategoryService/GetCategoryDescendants"
+	CategoryService_AddCategoryHierarchy_FullMethodName   = "/api.v1.catalogue.CategoryService/AddCategoryHierarchy"
 )
 
 // CategoryServiceClient is the client API for CategoryService service.
@@ -39,6 +42,9 @@ type CategoryServiceClient interface {
 	ListCategory(ctx context.Context, in *ListCategoryRequest, opts ...grpc.CallOption) (*ListCategoryResponse, error)
 	DeleteCategoryByID(ctx context.Context, in *DeleteCategoryByIDRequest, opts ...grpc.CallOption) (*DeleteCategoryByIDResponse, error)
 	DeleteCategoryBySlug(ctx context.Context, in *DeleteCategoryBySlugRequest, opts ...grpc.CallOption) (*DeleteCategoryBySlugResponse, error)
+	GetCategoryAncestors(ctx context.Context, in *GetCategoryAncestorsRequest, opts ...grpc.CallOption) (*GetCategoryAncestorsResponse, error)
+	GetCategoryDescendants(ctx context.Context, in *GetCategoryDescendantsRequest, opts ...grpc.CallOption) (*GetCategoryDescendantsResponse, error)
+	AddCategoryHierarchy(ctx context.Context, in *AddCategoryHierarchyRequest, opts ...grpc.CallOption) (*AddCategoryHierarchyResponse, error)
 }
 
 type categoryServiceClient struct {
@@ -119,6 +125,36 @@ func (c *categoryServiceClient) DeleteCategoryBySlug(ctx context.Context, in *De
 	return out, nil
 }
 
+func (c *categoryServiceClient) GetCategoryAncestors(ctx context.Context, in *GetCategoryAncestorsRequest, opts ...grpc.CallOption) (*GetCategoryAncestorsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCategoryAncestorsResponse)
+	err := c.cc.Invoke(ctx, CategoryService_GetCategoryAncestors_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) GetCategoryDescendants(ctx context.Context, in *GetCategoryDescendantsRequest, opts ...grpc.CallOption) (*GetCategoryDescendantsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCategoryDescendantsResponse)
+	err := c.cc.Invoke(ctx, CategoryService_GetCategoryDescendants_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) AddCategoryHierarchy(ctx context.Context, in *AddCategoryHierarchyRequest, opts ...grpc.CallOption) (*AddCategoryHierarchyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AddCategoryHierarchyResponse)
+	err := c.cc.Invoke(ctx, CategoryService_AddCategoryHierarchy_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CategoryServiceServer is the server API for CategoryService service.
 // All implementations should embed UnimplementedCategoryServiceServer
 // for forward compatibility.
@@ -130,6 +166,9 @@ type CategoryServiceServer interface {
 	ListCategory(context.Context, *ListCategoryRequest) (*ListCategoryResponse, error)
 	DeleteCategoryByID(context.Context, *DeleteCategoryByIDRequest) (*DeleteCategoryByIDResponse, error)
 	DeleteCategoryBySlug(context.Context, *DeleteCategoryBySlugRequest) (*DeleteCategoryBySlugResponse, error)
+	GetCategoryAncestors(context.Context, *GetCategoryAncestorsRequest) (*GetCategoryAncestorsResponse, error)
+	GetCategoryDescendants(context.Context, *GetCategoryDescendantsRequest) (*GetCategoryDescendantsResponse, error)
+	AddCategoryHierarchy(context.Context, *AddCategoryHierarchyRequest) (*AddCategoryHierarchyResponse, error)
 }
 
 // UnimplementedCategoryServiceServer should be embedded to have
@@ -159,6 +198,15 @@ func (UnimplementedCategoryServiceServer) DeleteCategoryByID(context.Context, *D
 }
 func (UnimplementedCategoryServiceServer) DeleteCategoryBySlug(context.Context, *DeleteCategoryBySlugRequest) (*DeleteCategoryBySlugResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCategoryBySlug not implemented")
+}
+func (UnimplementedCategoryServiceServer) GetCategoryAncestors(context.Context, *GetCategoryAncestorsRequest) (*GetCategoryAncestorsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCategoryAncestors not implemented")
+}
+func (UnimplementedCategoryServiceServer) GetCategoryDescendants(context.Context, *GetCategoryDescendantsRequest) (*GetCategoryDescendantsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCategoryDescendants not implemented")
+}
+func (UnimplementedCategoryServiceServer) AddCategoryHierarchy(context.Context, *AddCategoryHierarchyRequest) (*AddCategoryHierarchyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddCategoryHierarchy not implemented")
 }
 func (UnimplementedCategoryServiceServer) testEmbeddedByValue() {}
 
@@ -306,6 +354,60 @@ func _CategoryService_DeleteCategoryBySlug_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CategoryService_GetCategoryAncestors_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCategoryAncestorsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).GetCategoryAncestors(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_GetCategoryAncestors_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).GetCategoryAncestors(ctx, req.(*GetCategoryAncestorsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_GetCategoryDescendants_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCategoryDescendantsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).GetCategoryDescendants(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_GetCategoryDescendants_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).GetCategoryDescendants(ctx, req.(*GetCategoryDescendantsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_AddCategoryHierarchy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddCategoryHierarchyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).AddCategoryHierarchy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_AddCategoryHierarchy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).AddCategoryHierarchy(ctx, req.(*AddCategoryHierarchyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CategoryService_ServiceDesc is the grpc.ServiceDesc for CategoryService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -341,17 +443,32 @@ var CategoryService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "DeleteCategoryBySlug",
 			Handler:    _CategoryService_DeleteCategoryBySlug_Handler,
 		},
+		{
+			MethodName: "GetCategoryAncestors",
+			Handler:    _CategoryService_GetCategoryAncestors_Handler,
+		},
+		{
+			MethodName: "GetCategoryDescendants",
+			Handler:    _CategoryService_GetCategoryDescendants_Handler,
+		},
+		{
+			MethodName: "AddCategoryHierarchy",
+			Handler:    _CategoryService_AddCategoryHierarchy_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "catalogue.proto",
 }
 
 const (
-	ProductService_CreateProduct_FullMethodName  = "/api.v1.catalogue.ProductService/CreateProduct"
-	ProductService_UpdateProduct_FullMethodName  = "/api.v1.catalogue.ProductService/UpdateProduct"
-	ProductService_GetProductByID_FullMethodName = "/api.v1.catalogue.ProductService/GetProductByID"
-	ProductService_ListProduct_FullMethodName    = "/api.v1.catalogue.ProductService/ListProduct"
-	ProductService_DeleteProduct_FullMethodName  = "/api.v1.catalogue.ProductService/DeleteProduct"
+	ProductService_CreateProduct_FullMethodName       = "/api.v1.catalogue.ProductService/CreateProduct"
+	ProductService_UpdateProduct_FullMethodName       = "/api.v1.catalogue.ProductService/UpdateProduct"
+	ProductService_GetProductByID_FullMethodName      = "/api.v1.catalogue.ProductService/GetProductByID"
+	ProductService_ListProduct_FullMethodName         = "/api.v1.catalogue.ProductService/ListProduct"
+	ProductService_DeleteProduct_FullMethodName       = "/api.v1.catalogue.ProductService/DeleteProduct"
+	ProductService_AddToFavorites_FullMethodName      = "/api.v1.catalogue.ProductService/AddToFavorites"
+	ProductService_RemoveFromFavorites_FullMethodName = "/api.v1.catalogue.ProductService/RemoveFromFavorites"
+	ProductService_GetUserFavorites_FullMethodName    = "/api.v1.catalogue.ProductService/GetUserFavorites"
 )
 
 // ProductServiceClient is the client API for ProductService service.
@@ -363,6 +480,9 @@ type ProductServiceClient interface {
 	GetProductByID(ctx context.Context, in *GetProductByIDRequest, opts ...grpc.CallOption) (*GetProductByIDResponse, error)
 	ListProduct(ctx context.Context, in *ListProductRequest, opts ...grpc.CallOption) (*ListProductResponse, error)
 	DeleteProduct(ctx context.Context, in *DeleteProductRequest, opts ...grpc.CallOption) (*DeleteProductResponse, error)
+	AddToFavorites(ctx context.Context, in *AddToFavoritesRequest, opts ...grpc.CallOption) (*AddToFavoritesResponse, error)
+	RemoveFromFavorites(ctx context.Context, in *RemoveFromFavoritesRequest, opts ...grpc.CallOption) (*RemoveFromFavoritesResponse, error)
+	GetUserFavorites(ctx context.Context, in *GetUserFavoritesRequest, opts ...grpc.CallOption) (*GetUserFavoritesResponse, error)
 }
 
 type productServiceClient struct {
@@ -423,6 +543,36 @@ func (c *productServiceClient) DeleteProduct(ctx context.Context, in *DeleteProd
 	return out, nil
 }
 
+func (c *productServiceClient) AddToFavorites(ctx context.Context, in *AddToFavoritesRequest, opts ...grpc.CallOption) (*AddToFavoritesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AddToFavoritesResponse)
+	err := c.cc.Invoke(ctx, ProductService_AddToFavorites_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productServiceClient) RemoveFromFavorites(ctx context.Context, in *RemoveFromFavoritesRequest, opts ...grpc.CallOption) (*RemoveFromFavoritesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RemoveFromFavoritesResponse)
+	err := c.cc.Invoke(ctx, ProductService_RemoveFromFavorites_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productServiceClient) GetUserFavorites(ctx context.Context, in *GetUserFavoritesRequest, opts ...grpc.CallOption) (*GetUserFavoritesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUserFavoritesResponse)
+	err := c.cc.Invoke(ctx, ProductService_GetUserFavorites_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProductServiceServer is the server API for ProductService service.
 // All implementations should embed UnimplementedProductServiceServer
 // for forward compatibility.
@@ -432,6 +582,9 @@ type ProductServiceServer interface {
 	GetProductByID(context.Context, *GetProductByIDRequest) (*GetProductByIDResponse, error)
 	ListProduct(context.Context, *ListProductRequest) (*ListProductResponse, error)
 	DeleteProduct(context.Context, *DeleteProductRequest) (*DeleteProductResponse, error)
+	AddToFavorites(context.Context, *AddToFavoritesRequest) (*AddToFavoritesResponse, error)
+	RemoveFromFavorites(context.Context, *RemoveFromFavoritesRequest) (*RemoveFromFavoritesResponse, error)
+	GetUserFavorites(context.Context, *GetUserFavoritesRequest) (*GetUserFavoritesResponse, error)
 }
 
 // UnimplementedProductServiceServer should be embedded to have
@@ -455,6 +608,15 @@ func (UnimplementedProductServiceServer) ListProduct(context.Context, *ListProdu
 }
 func (UnimplementedProductServiceServer) DeleteProduct(context.Context, *DeleteProductRequest) (*DeleteProductResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteProduct not implemented")
+}
+func (UnimplementedProductServiceServer) AddToFavorites(context.Context, *AddToFavoritesRequest) (*AddToFavoritesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddToFavorites not implemented")
+}
+func (UnimplementedProductServiceServer) RemoveFromFavorites(context.Context, *RemoveFromFavoritesRequest) (*RemoveFromFavoritesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveFromFavorites not implemented")
+}
+func (UnimplementedProductServiceServer) GetUserFavorites(context.Context, *GetUserFavoritesRequest) (*GetUserFavoritesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserFavorites not implemented")
 }
 func (UnimplementedProductServiceServer) testEmbeddedByValue() {}
 
@@ -566,6 +728,60 @@ func _ProductService_DeleteProduct_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProductService_AddToFavorites_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddToFavoritesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).AddToFavorites(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_AddToFavorites_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).AddToFavorites(ctx, req.(*AddToFavoritesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProductService_RemoveFromFavorites_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveFromFavoritesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).RemoveFromFavorites(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_RemoveFromFavorites_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).RemoveFromFavorites(ctx, req.(*RemoveFromFavoritesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProductService_GetUserFavorites_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserFavoritesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).GetUserFavorites(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_GetUserFavorites_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).GetUserFavorites(ctx, req.(*GetUserFavoritesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProductService_ServiceDesc is the grpc.ServiceDesc for ProductService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -592,6 +808,18 @@ var ProductService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteProduct",
 			Handler:    _ProductService_DeleteProduct_Handler,
+		},
+		{
+			MethodName: "AddToFavorites",
+			Handler:    _ProductService_AddToFavorites_Handler,
+		},
+		{
+			MethodName: "RemoveFromFavorites",
+			Handler:    _ProductService_RemoveFromFavorites_Handler,
+		},
+		{
+			MethodName: "GetUserFavorites",
+			Handler:    _ProductService_GetUserFavorites_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

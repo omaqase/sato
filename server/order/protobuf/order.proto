@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "github.com/omaqase/sato/server/order/pkg/api/v1/order;order";
+
+package api.v1.order;
+
+import "google/api/annotations.proto";
+
+import "order_messages.proto";
+
+service OrderService {
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/orders/",
+      body: "*"
+    };
+  }
+}

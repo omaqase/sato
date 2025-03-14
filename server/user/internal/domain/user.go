@@ -8,7 +8,7 @@ type User struct {
 	Role            string
 	FirstName       string
 	LastName        string
-	Phone           string
+	Phone           *string
 	PaymentMethodID string
 	Promotions      bool
 	EmailVerified   bool

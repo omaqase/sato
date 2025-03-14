@@ -33,10 +33,13 @@ axiosInstance.interceptors.response.use(
 
         originalRequest.headers.Authorization = `Bearer ${tokens.access_token}`
         return axios(originalRequest)
-      } catch (error) {
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
-        window.location.href = '/security/login'
+      } catch (refreshError) {
+        if (refreshError.response?.status === 401) {
+          localStorage.removeItem('access_token')
+          localStorage.removeItem('refresh_token')
+          window.location.href = '/security/login'
+        }
+        return Promise.reject(refreshError)
       }
     }
 

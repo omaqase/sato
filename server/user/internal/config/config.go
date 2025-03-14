@@ -2,14 +2,15 @@ package config
 
 import (
 	"fmt"
-	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/joho/godotenv"
-	"github.com/kelseyhightower/envconfig"
-	"github.com/redis/go-redis/v9"
 	"log"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
+	"github.com/kelseyhightower/envconfig"
+	"github.com/redis/go-redis/v9"
 )
 
 type Config struct {
@@ -31,10 +32,10 @@ type DatabaseConfig struct {
 	Password     string        `envconfig:"DB_PASSWORD" required:"true"`
 	Database     string        `envconfig:"DB_DATABASE" required:"true"`
 	MaxConns     int32         `envconfig:"DB_MAXCONNS" default:"10"`
-	MinConns     int32         `envconfig:"DB_MINCONNS" default:"5"`
-	MaxConnIdle  time.Duration `envconfig:"DB_MAXCONN_IDLE" default:"5m"`
-	MaxConnLife  time.Duration `envconfig:"DB_MAXCONNLIFE" default:"30m"`
-	QueryTimeout time.Duration `envconfig:"DB_QUERYTIMEOUT" default:"10s"`
+	MinConns     int32         `envconfig:"DB_MINCONNS" default:"2"`
+	MaxConnIdle  time.Duration `envconfig:"DB_MAXCONN_IDLE" default:"30m"`
+	MaxConnLife  time.Duration `envconfig:"DB_MAXCONNLIFE" default:"1h"`
+	QueryTimeout time.Duration `envconfig:"DB_QUERYTIMEOUT" default:"30s"`
 }
 
 type SecurityConfig struct {

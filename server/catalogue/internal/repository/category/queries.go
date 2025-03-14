@@ -44,3 +44,24 @@ const ListCategoriesSQL = `
    ORDER BY created_at DESC
    LIMIT $1 OFFSET $2
 `
+
+const AddCategoryHierarchySQL = `
+    INSERT INTO product_management.categories_hierarchy (ancestor, descendant, depth)
+    VALUES ($1, $2, $3)
+`
+
+const GetCategoryAncestorsSQL = `
+    SELECT c.id, c.title, c.slug, c.created_at, c.updated_at
+    FROM product_management.categories c
+    INNER JOIN product_management.categories_hierarchy h ON h.ancestor = c.id
+    WHERE h.descendant = $1 AND c.deleted_at IS NULL
+    ORDER BY h.depth DESC
+`
+
+const GetCategoryDescendantsSQL = `
+    SELECT c.id, c.title, c.slug, c.created_at, c.updated_at
+    FROM product_management.categories c
+    INNER JOIN product_management.categories_hierarchy h ON h.descendant = c.id
+    WHERE h.ancestor = $1 AND c.deleted_at IS NULL
+    ORDER BY h.depth ASC
+`

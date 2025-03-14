@@ -185,6 +185,38 @@
         ]
       }
     },
+    "/api/v1/category/hierarchy": {
+      "post": {
+        "operationId": "CategoryService_AddCategoryHierarchy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/catalogueAddCategoryHierarchyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/catalogueAddCategoryHierarchyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CategoryService"
+        ]
+      }
+    },
     "/api/v1/category/{categoryId}": {
       "get": {
         "operationId": "CategoryService_GetCategoryByID",
@@ -193,6 +225,66 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/catalogueGetCategoryByIDResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CategoryService"
+        ]
+      }
+    },
+    "/api/v1/category/{categoryId}/ancestors": {
+      "get": {
+        "operationId": "CategoryService_GetCategoryAncestors",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/catalogueGetCategoryAncestorsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CategoryService"
+        ]
+      }
+    },
+    "/api/v1/category/{categoryId}/descendants": {
+      "get": {
+        "operationId": "CategoryService_GetCategoryDescendants",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/catalogueGetCategoryDescendantsResponse"
             }
           },
           "default": {
@@ -436,6 +528,32 @@
         }
       }
     },
+    "catalogueAddCategoryHierarchyRequest": {
+      "type": "object",
+      "properties": {
+        "ancestorId": {
+          "type": "string"
+        },
+        "descendantId": {
+          "type": "string"
+        },
+        "depth": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "catalogueAddCategoryHierarchyResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
+    "catalogueAddToFavoritesResponse": {
+      "type": "object"
+    },
     "catalogueCreateCategoryRequest": {
       "type": "object",
       "properties": {
@@ -467,10 +585,13 @@
     "catalogueCreateProductRequest": {
       "type": "object",
       "properties": {
-        "categoryId": {
+        "title": {
           "type": "string"
         },
-        "title": {
+        "slug": {
+          "type": "string"
+        },
+        "categoryId": {
           "type": "string"
         },
         "stock": {
@@ -502,8 +623,8 @@
           "type": "number",
           "format": "float"
         },
-        "approved": {
-          "type": "boolean"
+        "approveStatus": {
+          "type": "string"
         },
         "createdAt": {
           "type": "string"
@@ -534,6 +655,38 @@
         "status": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "catalogueGetCategoryAncestorsItem": {
+      "type": "object",
+      "properties": {
+        "categoryId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      }
+    },
+    "catalogueGetCategoryAncestorsResponse": {
+      "type": "object",
+      "properties": {
+        "ancestors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/catalogueGetCategoryAncestorsItem"
+          }
         }
       }
     },
@@ -577,6 +730,38 @@
         }
       }
     },
+    "catalogueGetCategoryDescendantsItem": {
+      "type": "object",
+      "properties": {
+        "categoryId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      }
+    },
+    "catalogueGetCategoryDescendantsResponse": {
+      "type": "object",
+      "properties": {
+        "descendants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/catalogueGetCategoryDescendantsItem"
+          }
+        }
+      }
+    },
     "catalogueGetProductByIDResponse": {
       "type": "object",
       "properties": {
@@ -608,6 +793,17 @@
         },
         "updatedAt": {
           "type": "string"
+        }
+      }
+    },
+    "catalogueGetUserFavoritesResponse": {
+      "type": "object",
+      "properties": {
+        "productIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -688,6 +884,9 @@
           }
         }
       }
+    },
+    "catalogueRemoveFromFavoritesResponse": {
+      "type": "object"
     },
     "catalogueUpdateCategoryResponse": {
       "type": "object",

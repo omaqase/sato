@@ -91,9 +91,10 @@ message DeleteCategoryBySlugResponse {
 // Product
 
 message CreateProductRequest {
-  string category_id = 1;
-  string title = 2;
-  int32 stock = 3;
+  string title = 1;
+  string slug = 2;
+  string category_id = 3;
+  int32 stock = 4;
 }
 
 message CreateProductResponse {
@@ -103,7 +104,7 @@ message CreateProductResponse {
   string title = 4;
   int32 stock = 5;
   float rating = 6;
-  bool approved = 7;
+  string approve_status = 7;
   string created_at = 8;
 }
 
@@ -167,4 +168,85 @@ message DeleteProductRequest {
 
 message DeleteProductResponse {
   int32 status = 1;
+}
+
+message GetCategoryAncestorsRequest {
+  string category_id = 1;
+}
+
+message GetCategoryAncestorsItem {
+  string category_id = 1;
+  string title = 2;
+  string slug = 3;
+  string created_at = 4;
+  string updated_at = 5;
+}
+
+message GetCategoryAncestorsResponse {
+  repeated GetCategoryAncestorsItem ancestors = 1;
+}
+
+message GetCategoryDescendantsRequest {
+  string category_id = 1;
+}
+
+message GetCategoryDescendantsItem {
+  string category_id = 1;
+  string title = 2;
+  string slug = 3;
+  string created_at = 4;
+  string updated_at = 5;
+}
+message GetCategoryDescendantsResponse {
+  repeated GetCategoryDescendantsItem descendants = 1;
+}
+
+message AddCategoryHierarchyRequest {
+  string ancestor_id = 1;
+  string descendant_id = 2;
+  int32 depth = 3;
+}
+
+message AddCategoryHierarchyResponse {
+  bool success = 1;
+}
+
+message GetProductBySlugRequest {
+  string slug = 1;
+}
+
+message GetProductBySlugResponse {
+  string product_id = 1;
+  string category_id = 2;
+  string seller_id = 3;
+  string title = 4;
+  int32 stock = 5;
+  float rating = 6;
+  bool approved = 7;
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+message AddToFavoritesRequest {
+    string user_id = 1;
+    string product_id = 2;
+}
+
+message AddToFavoritesResponse {}
+
+message RemoveFromFavoritesRequest {
+    string user_id = 1;
+    string product_id = 2;
+}
+
+message RemoveFromFavoritesResponse {}
+
+message GetUserFavoritesRequest {
+    string user_id = 1;
+    int32 limit = 2;
+    int32 offset = 3;
+}
+
+message GetUserFavoritesResponse {
+    repeated string product_ids = 1;
 }

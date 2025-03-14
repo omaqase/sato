@@ -20,11 +20,11 @@
               <h1 class="text-3xl font-bold mb-1">Избранное</h1>
               <div class="flex items-center gap-4 text-white/80">
                 <span
-                  >{{ favorites.length }}
-                  {{ getNoun(favorites.length, 'товар', 'товара', 'товаров') }}</span
+                  >{{ favoritesStore.favorites.length }}
+                  {{ getNoun(favoritesStore.favorites.length, 'товар', 'товара', 'товаров') }}</span
                 >
                 <button
-                  v-if="favorites.length"
+                  v-if="favoritesStore.favorites.length"
                   @click="clearAll"
                   class="text-white/60 hover:text-white transition-colors"
                 >
@@ -38,107 +38,40 @@
     </div>
 
     <div class="max-w-7xl mx-auto px-4 -mt-8">
-      <div
-        v-if="favorites.length"
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-      >
-        <div
-          v-for="product in favorites"
-          :key="product.id"
-          class="bg-white rounded-2xl shadow-sm overflow-hidden group flex flex-col"
-        >
-          <!-- Product Image -->
-          <div class="relative aspect-square overflow-hidden">
-            <div class="w-full h-full">
-              <img
-                :src="product.image"
-                :alt="product.name"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-              <div class="absolute inset-0 ring-1 ring-inset ring-black/5" />
-            </div>
+      <!-- Loading State -->
+      <div v-if="favoritesStore.isLoading" class="flex justify-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
 
-            <!-- Quick Actions -->
-            <div class="absolute top-4 right-4 flex flex-col gap-2 z-10">
-              <button
-                @click="removeFromFavorites(product.id)"
-                class="p-2 rounded-xl bg-white/90 backdrop-blur-sm text-gray-700 hover:text-red-600 shadow-sm transition-colors"
-              >
-                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M6 18L18 6M6 6l12 12"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <div class="p-6 flex flex-col flex-1">
-            <!-- Price Block -->
-            <div class="mb-4">
-              <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-bold text-gray-900"
-                  >{{ formatPrice(product.price) }} ₽</span
-                >
-                <span v-if="product.oldPrice" class="text-sm text-gray-400 line-through">
-                  {{ formatPrice(product.oldPrice) }} ₽
-                </span>
-              </div>
-              <div v-if="product.discount" class="mt-1">
-                <span class="text-sm font-medium text-red-600">Скидка {{ product.discount }}%</span>
-              </div>
-            </div>
-
-            <!-- Title -->
-            <h3
-              class="text-lg font-medium text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 min-h-[3.5rem]"
-            >
-              {{ product.name }}
-            </h3>
-
-            <!-- Spacer -->
-            <div class="flex-1"></div>
-
-            <!-- Rating -->
-            <div class="flex items-center gap-2 mb-4">
-              <div class="flex text-yellow-400">
-                <svg
-                  v-for="i in 5"
-                  :key="i"
-                  class="w-4 h-4"
-                  :class="i <= product.rating ? 'fill-current' : 'stroke-current fill-none'"
-                >
-                  <path
-                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                  />
-                </svg>
-              </div>
-              <span class="text-sm text-gray-500">{{ product.reviewsCount }} отзывов</span>
-            </div>
-
-            <!-- Add to Cart -->
-            <button
-              class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2 group"
-            >
-              <span>В корзину</span>
-              <svg
-                class="w-5 h-5 transition-transform group-hover:translate-x-1"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <path
-                  d="M5 12h14m-6-6l6 6-6 6"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                />
-              </svg>
-            </button>
-          </div>
+      <!-- Error State -->
+      <div v-else-if="favoritesStore.error" class="max-w-2xl mx-auto bg-red-50 rounded-2xl p-8 text-center">
+        <div class="w-16 h-16 mx-auto mb-4 text-red-500">
+          <svg viewBox="0 0 24 24" fill="none" class="w-full h-full">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" 
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
+        <h3 class="text-lg font-medium text-red-800 mb-2">{{ favoritesStore.error }}</h3>
+        <button @click="favoritesStore.fetchFavorites" 
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+          Try Again
+        </button>
+      </div>
+
+      <!-- Products Grid -->
+      <div v-else-if="favoritesStore.favorites.length" 
+           class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <ProductCard v-for="product in favoritesStore.favorites" 
+                    :key="product.productId" 
+                    :product="product"
+                    class="h-full">
+          <template #actions>
+            <button @click="favoritesStore.removeFromFavorites(product.productId)"
+                    class="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+              Remove from Favorites
+            </button>
+          </template>
+        </ProductCard>
       </div>
 
       <!-- Empty State -->
@@ -183,54 +116,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted } from 'vue'
+import { useFavoritesStore } from '@/stores/useFavoritesStore'
+import ProductCard from '@/components/ProductCard.vue'
 
-interface Product {
-  id: number
-  name: string
-  price: number
-  oldPrice?: number
-  discount?: number
-  rating: number
-  reviewsCount: number
-  image: string
-}
-
-// Моковые данные
-const favorites = ref<Product[]>([
-  {
-    id: 1,
-    name: 'iPhone 13 Pro 256GB Графитовый',
-    price: 89990,
-    oldPrice: 99990,
-    discount: 10,
-    rating: 5,
-    reviewsCount: 128,
-    image: 'https://via.placeholder.com/400x500',
-  },
-  {
-    id: 2,
-    name: 'MacBook Pro 14" M1 Pro 16/512GB Space Gray',
-    price: 179990,
-    oldPrice: 189990,
-    discount: 5,
-    rating: 4,
-    reviewsCount: 64,
-    image: 'https://via.placeholder.com/400x500',
-  },
-])
-
-function formatPrice(price: number): string {
-  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
-}
-
-function removeFromFavorites(id: number) {
-  favorites.value = favorites.value.filter((item) => item.id !== id)
-}
-
-function clearAll() {
-  favorites.value = []
-}
+const favoritesStore = useFavoritesStore()
 
 function getNoun(number: number, one: string, two: string, five: string): string {
   const cases = [2, 0, 1, 1, 1, 2]
@@ -238,4 +128,12 @@ function getNoun(number: number, one: string, two: string, five: string): string
     number % 100 > 4 && number % 100 < 20 ? 2 : cases[number % 10 < 5 ? number % 10 : 5]
   ]
 }
+
+function clearAll() {
+  favoritesStore.favorites = []
+}
+
+onMounted(() => {
+  favoritesStore.fetchFavorites()
+})
 </script>

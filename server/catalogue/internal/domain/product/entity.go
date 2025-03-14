@@ -5,6 +5,7 @@ import "time"
 type Entity struct {
 	ID         string
 	Title      string
+	Slug       string
 	CategoryID string
 	SellerID   string
 	Stock      int

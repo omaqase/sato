@@ -1,9 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- Sidebar -->
     <aside class="fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200">
       <div class="flex items-center gap-3 px-6 h-16 border-b border-gray-200">
-        <!-- <img src="/logo.svg" alt="Logo" class="h-8" /> -->
         <span class="font-bold text-gray-900">Seller Dashboard</span>
       </div>
 
@@ -21,9 +19,7 @@
       </nav>
     </aside>
 
-    <!-- Main Content -->
     <main class="pl-64">
-      <!-- Header -->
       <header class="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between">
         <h1 class="text-xl font-bold text-gray-900">{{ currentPage }}</h1>
 
@@ -34,7 +30,6 @@
           </div>
 
           <button class="relative group">
-            <!-- <img src="/avatar.jpg" alt="Avatar" class="w-8 h-8 rounded-full" /> -->
             <div
               class="hidden group-hover:block absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2"
             >

@@ -76,7 +76,7 @@ const benefits = [
   {
     id: 1,
     title: 'Стабильный доход',
-    description: 'От 30 000 ₽ в месяц за выдачу заказов',
+    description: 'От 150 000 ₸ в месяц за выдачу заказов',
     icon: CoinsIcon,
   },
   {

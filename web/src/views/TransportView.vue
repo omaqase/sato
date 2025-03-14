@@ -10,6 +10,7 @@
             </p>
             <button
               class="mt-8 px-8 py-4 bg-white text-blue-600 rounded-xl font-medium hover:bg-blue-50 transition-colors"
+              @click="showFeatureInDevelopment"
             >
               Стать партнером
             </button>
@@ -62,6 +63,7 @@
             </p>
             <button
               class="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
+              @click="showFeatureInDevelopment"
             >
               Оставить заявку
             </button>
@@ -82,6 +84,9 @@ import FlameIcon from '@/components/icons/FlameIcon.vue'
 import ListCheckIcon from '@/components/icons/ListCheckIcon.vue'
 import TruckIcon from '@/components/icons/TruckIcon.vue'
 import UserExperienceIcon from '@/components/icons/UserExperienceIcon.vue'
+import { useToast } from "@/composables/useToast"
+
+const { showFeatureInDevelopment } = useToast()
 
 const advantages = [
   {

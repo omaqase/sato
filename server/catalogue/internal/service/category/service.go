@@ -2,12 +2,14 @@ package category
 
 import (
 	"context"
+	"log"
+	"time"
+
 	"github.com/omaqase/sato/catalogue/internal/repository/category"
 	"github.com/omaqase/sato/catalogue/internal/service"
 	protobuf "github.com/omaqase/sato/catalogue/pkg/api/v1/catalogue"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"time"
 )
 
 type Service struct {
@@ -42,7 +44,10 @@ func (s Service) CreateCategory(ctx context.Context, request *protobuf.CreateCat
 }
 
 func (s Service) UpdateCategory(ctx context.Context, request *protobuf.UpdateCategoryRequest) (*protobuf.UpdateCategoryResponse, error) {
+	log.Printf("request: %v", request)
+
 	if err := ValidateUpdateCategoryRequest(request); err != nil {
+		log.Printf("err: %v", err)
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
@@ -158,4 +163,59 @@ func (s Service) DeleteCategoryBySlug(ctx context.Context, request *protobuf.Del
 	}
 
 	return &protobuf.DeleteCategoryBySlugResponse{}, nil
+}
+
+func (s Service) GetCategoryAncestors(ctx context.Context, req *protobuf.GetCategoryAncestorsRequest) (*protobuf.GetCategoryAncestorsResponse, error) {
+	ancestors, err := s.repository.GetAncestors(ctx, req.CategoryId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get category ancestors: %v", err)
+	}
+
+	var protoAncestors []*protobuf.GetCategoryAncestorsItem
+	for _, ancestor := range ancestors {
+		protoAncestors = append(protoAncestors, &protobuf.GetCategoryAncestorsItem{
+			CategoryId: ancestor.ID,
+			Title:      ancestor.Title,
+			Slug:       ancestor.Slug,
+			CreatedAt:  ancestor.CreatedAt.Format(time.DateTime),
+			UpdatedAt:  ancestor.UpdatedAt.Format(time.DateTime),
+		})
+	}
+
+	return &protobuf.GetCategoryAncestorsResponse{
+		Ancestors: protoAncestors,
+	}, nil
+}
+
+func (s Service) GetCategoryDescendants(ctx context.Context, req *protobuf.GetCategoryDescendantsRequest) (*protobuf.GetCategoryDescendantsResponse, error) {
+	descendants, err := s.repository.GetDescendants(ctx, req.CategoryId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get category descendants: %v", err)
+	}
+
+	var protoDescendants []*protobuf.GetCategoryDescendantsItem
+	for _, descendant := range descendants {
+		protoDescendants = append(protoDescendants, &protobuf.GetCategoryDescendantsItem{
+			CategoryId: descendant.ID,
+			Title:      descendant.Title,
+			Slug:       descendant.Slug,
+			CreatedAt:  descendant.CreatedAt.Format(time.DateTime),
+			UpdatedAt:  descendant.UpdatedAt.Format(time.DateTime),
+		})
+	}
+
+	return &protobuf.GetCategoryDescendantsResponse{
+		Descendants: protoDescendants,
+	}, nil
+}
+
+func (s Service) AddCategoryHierarchy(ctx context.Context, req *protobuf.AddCategoryHierarchyRequest) (*protobuf.AddCategoryHierarchyResponse, error) {
+	err := s.repository.AddHierarchy(ctx, req.AncestorId, req.DescendantId, int(req.Depth))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to add category hierarchy: %v", err)
+	}
+
+	return &protobuf.AddCategoryHierarchyResponse{
+		Success: true,
+	}, nil
 }

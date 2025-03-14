@@ -15,3 +15,14 @@ type UpdateContract struct {
 	Phone      string
 	Promotions bool
 }
+
+type AddToFavoritesContract struct {
+	UserID    string
+	ProductID string
+}
+
+type GetFavoritesContract struct {
+	UserID string
+	Limit  int
+	Offset int
+}

@@ -3,12 +3,13 @@ package grpc
 import (
 	"context"
 	"fmt"
+	"net"
+
 	protobuf "github.com/omaqase/sato/catalogue/pkg/api/v1/catalogue"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/reflection"
-	"net"
 )
 
 type Server struct {

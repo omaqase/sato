@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+
 	"github.com/omaqase/sato/user/internal/config"
 	"github.com/omaqase/sato/user/internal/grpc"
 	"github.com/omaqase/sato/user/internal/repository/cache"
@@ -27,10 +28,13 @@ func main() {
 			session.NewSessionStore,
 			service.NewJWTService,
 			postgres.NewUsersRepository,
+			postgres.NewCartRepository,
 			service.NewUsersService,
+			service.NewCartService,
 			grpc.NewGRPCServer,
+			grpc.NewListener,
 		),
-		fx.Invoke(func(config *grpc.Server) {}),
+		fx.Invoke(grpc.StartGRPCServer),
 	)
 
 	app.Run()

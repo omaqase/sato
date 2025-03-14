@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/omaqase/sato/catalogue/internal/domain/product"
@@ -15,6 +16,7 @@ type IRepository interface {
 	GetByID(ctx context.Context, id string) (*product.Entity, error)
 	DeleteByID(ctx context.Context, id string) error
 	List(ctx context.Context, limit, offset int) ([]*product.Entity, error)
+	GetBySlug(ctx context.Context, slug string) (*product.Entity, error)
 }
 
 type Repository struct {
@@ -122,4 +124,17 @@ func (r Repository) List(ctx context.Context, limit, offset int) ([]*product.Ent
 	}
 
 	return products, nil
+}
+
+func (r Repository) GetBySlug(ctx context.Context, slug string) (*product.Entity, error) {
+	dest := new(product.Entity)
+	row := r.pool.QueryRow(ctx, GetProductBySlugSQL, slug)
+	err := row.Scan(&dest.ID, &dest.Title, &dest.Slug, &dest.CategoryID, &dest.SellerID, &dest.Stock, &dest.Rating, &dest.Approved, &dest.CreatedAt, &dest.UpdatedAt)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, fmt.Errorf("product with slug %s not found: %w", slug, err)
+		}
+		return nil, fmt.Errorf("failed to get product by slug: %w", err)
+	}
+	return dest, nil
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+
 	"github.com/omaqase/sato/catalogue/internal/config"
 	"github.com/omaqase/sato/catalogue/internal/grpc"
 	categoryRepository "github.com/omaqase/sato/catalogue/internal/repository/category"
